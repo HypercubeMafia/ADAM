@@ -1,94 +1,89 @@
-import React from 'react';
-import Button from '@material-ui/core/Button';
-import Icon from '@material-ui/core/Icon';
-import { withStyles } from '@material-ui/core/styles';
-import Typography from '@material-ui/core/Typography';
-import AddIcon from '@material-ui/icons/Add';
-import DeleteIcon from '@material-ui/icons/Delete';
-import { Link } from 'gatsby';
+import React from "react";
+import Card from "@material-ui/core/Card";
+import CardActionArea from "@material-ui/core/CardActionArea";
+import CardActions from "@material-ui/core/CardActions";
+import CardContent from "@material-ui/core/CardContent";
+import Grid from "@material-ui/core/Grid";
+import Typography from "@material-ui/core/Typography";
+import ADAMToolbar from 'components/toolbar.js';
 
-import Layout from '../components/layout';
+//import { Link } from 'gatsby';
 
-const styles = theme => ({
-    section: {
-        marginTop: theme.spacing.unit * 3
-    },
-    toolbar: {
-        marginTop: theme.spacing.unit * 2
-    },
-    button: {
-        marginRight: theme.spacing.unit
-    }
-});
+const styles = {
+  card: {
+    width: 200
+  },
+  preview_pane: {
+    marginBottom: 100,
+    fontSize: 14
+  },
+  banner: {
+    //paddingTop: 0,
+    //paddingBottom: 0
+  },
+  option: {
+    marginLeft: "auto"
+  }
+};
 
-const IndexPage = ({ classes }) => (
-    <Layout>
-        <Typography variant="display2" gutterBottom>
-            Hi people
-        </Typography>
-        <Typography>Welcome to your new Gatsby site.</Typography>
-        <Typography>This page has been styled using Material-UI.</Typography>
+var machines = [
+  { title: "Sample DFA", type: "dfa" },
+  { title: "Sample NFA", type: "nfa" },
+  { title: "Sample TM", type: "tm" },
+  { title: "Another DFA", type: "dfa" }
+];
 
-        <section className={classes.section}>
-            <Typography variant="title" gutterBottom>
-                Sample Components
+var colors = { dfa: "#7e57c2", nfa: "#ffa726", tm: "#42a5f5" };
+
+class MachineCard extends React.Component {
+  render() {
+    return (
+      <div>
+      <Card style={styles.card}>
+        <CardActions
+          style={{ ...styles.banner, backgroundColor: colors[this.props.type] }}
+        >
+          <Typography variant="body2">
+            {this.props.title.toUpperCase()}
+          </Typography>
+        </CardActions>
+       {/*<Link to="/dfa_home/">*/} <CardActionArea>
+          <CardContent >
+            <Typography style={styles.preview_pane} color="textSecondary">
+              Click me to get to the machine.
             </Typography>
-            <div className={classes.toolbar}>
-                <Button
-                    variant="contained"
-                    color="primary"
-                    className={classes.button}
-                >
-                    Primary
-                </Button>
-                <Button
-                    variant="contained"
-                    color="secondary"
-                    className={classes.button}
-                >
-                    Secondary
-                </Button>
-            </div>
-            <div className={classes.toolbar}>
-                <Button
-                    variant="fab"
-                    color="primary"
-                    aria-label="Add"
-                    className={classes.button}
-                >
-                    <AddIcon />
-                </Button>
-                <Button
-                    variant="fab"
-                    color="primary"
-                    aria-label="Edit"
-                    className={classes.button}
-                >
-                    <Icon>edit_icon</Icon>
-                </Button>
-                <Button
-                    variant="fab"
-                    color="secondary"
-                    aria-label="Delete"
-                    className={classes.button}
-                >
-                    <DeleteIcon />
-                </Button>
-                <Button
-                    variant="fab"
-                    color="secondary"
-                    aria-label="Star"
-                    className={classes.button}
-                >
-                    <Icon>star</Icon>
-                </Button>
-            </div>
-        </section>
+          </CardContent>
+        </CardActionArea>{/*</Link>*/}
+      </Card>
+      </div>
+    );
+  }
+}
 
-        <section className={classes.section}>
-            <Link to="/page-2/">Go to page 2</Link>
-        </section>
-    </Layout>
-);
+class CardGrid extends React.Component {
+  render() {
+    return (
+      <Grid container spacing={16} style={{margin:16}}>
+        {machines.map(x => (
+          <Grid item>
+            <MachineCard title={x.title} type={x.type} />
+          </Grid>
+        ))}
+      </Grid>
+    );
+  }
+}
 
-export default withStyles(styles)(IndexPage);
+class MachineSelectPage extends React.Component {
+  render() {
+    return (
+        <div>
+          <ADAMToolbar title="Select a Machine"/>
+          <CardGrid/>
+          {/*<AddMachineButton/>*/}
+        </div>
+    );
+  }
+}
+
+export default MachineSelectPage;
