@@ -5,11 +5,11 @@ A web based tool for drawing, executing, and experimenting with various theoreti
 ## Prerequisites
 
 Make sure that you have the npm and Gatsby CLI v2 program installed. Install
-[npm](https://www.npmjs.com/), then run:
+[npm](https://www.npmjs.com/) and [yarn](https://yarnpkg.com/en/), then run:
 
 ```sh
 $ npm install --global gatsby-cli@next
-$ npm install
+$ yarn
 ```
 
 ## Usage
