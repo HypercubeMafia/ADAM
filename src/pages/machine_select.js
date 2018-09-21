@@ -45,7 +45,7 @@ class MachineCard extends React.Component {
             {this.props.title.toUpperCase()}
           </Typography>
         </CardActions>
-        <CardActionArea onClick={() => this.props.todfa(this.props.title.toUpperCase())}>
+        <CardActionArea onClick={() => this.props.todfa(this.props.title)}>
           <CardContent >
             <Typography style={styles.preview_pane} color="textSecondary">
               Click me to get to the machine.

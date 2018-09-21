@@ -9,11 +9,13 @@ class App extends React.Component {
   toMachineSelect = () => {
     this.setState({ currentPage : "machine-select",
                     currentMachine : null  });
+    document.title = "ADAM: Another Drawer of Alan's Machines"
   };
 
   toDFAHome = (title) => {
     this.setState({ currentPage : "dfa-home",
-                    currentMachine : title });
+                    currentMachine : title.toUpperCase() });
+    document.title = title;
   };
 
   render() {
