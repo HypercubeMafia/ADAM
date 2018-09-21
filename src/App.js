@@ -3,16 +3,18 @@ import MachineSelectPage from './pages/machine_select.js';
 import DFAHomePage from './pages/dfa_home.js'
 
 class App extends React.Component {
-  state = { currentPage : "machine-select",
-            currentMachine : null };
+  constructor() {
+    super();
+    this.toMachineSelect();
+  }
 
-  toMachineSelect = () => {
+  toMachineSelect() {
     this.setState({ currentPage : "machine-select",
                     currentMachine : null  });
     document.title = "ADAM: Another Drawer of Alan's Machines"
   };
 
-  toDFAHome = (title) => {
+  toDFAHome(title) {
     this.setState({ currentPage : "dfa-home",
                     currentMachine : title.toUpperCase() });
     document.title = title;
