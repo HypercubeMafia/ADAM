@@ -1,4 +1,6 @@
 import React from "react";
+import AddIcon from '@material-ui/icons/Add';
+import Button from '@material-ui/core/Button';
 import Card from "@material-ui/core/Card";
 import CardActionArea from "@material-ui/core/CardActionArea";
 import CardActions from "@material-ui/core/CardActions";
@@ -72,13 +74,37 @@ class CardGrid extends React.Component {
   }
 }
 
+class AddMachineButton extends React.Component {
+  state = { open: false };
+
+  // handleOpen = () => {
+  //   this.setState({ open: true, });
+  // };
+  //
+  // handleClose = () => {
+  //   this.setState({ open: false });
+  // };
+
+  render() {
+    return (
+      <div>
+        <Button onClick={this.handleOpen} variant="fab" color="primary"
+                style={{ right: 20, bottom: 20, position: 'fixed'}}>
+          <AddIcon />
+        </Button>
+        {/*<NewMachineDialog open={this.state.open} onClose={this.handleClose}/>*/}
+      </div>
+    );
+  }
+}
+
 class MachineSelectPage extends React.Component {
   render() {
     return (
         <div>
           <ADAMToolbar title="Select a Machine" />
           <CardGrid todfa={this.props.todfa}/>
-          {/*<AddMachineButton/>*/}
+          <AddMachineButton/>
         </div>
     );
   }
