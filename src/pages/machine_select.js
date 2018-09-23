@@ -45,6 +45,52 @@ const styles = {
 var MachineColors = { dfa: "#7e57c2", nfa: "#ffa726", tm: "#42a5f5" };
 
 class DuplicateDialog extends React.Component {
+
+  state = {
+    name: "",
+    hintText: ""
+  }
+
+  textField = () => (
+    <TextField
+      helperText={this.state.hintText}
+      error={this.state.hintText.length > 0}
+      autoFocus
+      margin="dense"
+      label="Machine Name"
+      type="string"
+      onChange={e => this.setState(
+        { name: e.target.value, hintText: this.buildHintText(e.target.value) }
+      )}
+      fullWidth
+    />
+  );
+
+  buildHintText = name => {
+    if (name === "") {
+      return "Please enter a machine name.";
+    } else if (this.props.machines.some(machine => machine.title.toLowerCase() === name.toLowerCase())) {
+      return "This name is already in use.";
+    } else {
+      return "";
+    }
+  }
+
+  onSubmit = () => {
+    var h = this.buildHintText(this.state.name);
+    if (h === "") {
+      this.props.addMachine(this.props.type, this.state.name);
+      this.props.onClose();
+    } else {
+      this.setState(
+        (prevState, props) => {
+          return { name: prevState.name,
+                   hintText: h };
+        }
+      );
+    }
+  }
+
   render() {
     return (
       <Dialog
@@ -52,25 +98,18 @@ class DuplicateDialog extends React.Component {
           onClose={this.props.onClose}
           aria-labelledby="form-dialog-title"
         >
-          <DialogTitle id="form-dialog-title">Duplicate Machine</DialogTitle>
+          <DialogTitle id="form-dialog-title">Duplicating "{this.props.name}"</DialogTitle>
           <DialogContent>
             <DialogContentText>
               Enter the name of the new machine.
             </DialogContentText>
-            <TextField
-              autoFocus
-              margin="dense"
-              id="name"
-              placeholder="Machine Name"
-              type="string"
-              fullWidth
-            />
+            {this.textField()}
           </DialogContent>
           <DialogActions>
             <Button onClick={this.props.onClose} color="primary">
               Cancel
             </Button>
-            <Button onClick={this.handleClose} color="primary">
+            <Button onClick={this.onSubmit} color="primary">
               Submit
             </Button>
           </DialogActions>
@@ -116,7 +155,9 @@ class MachineCard extends React.Component {
           Duplicate
         </MenuItem>
       </Menu>
-      <DuplicateDialog isOpen={this.state.duplicateOpen} onClose={this.handleOptionsClose}/>
+      <DuplicateDialog isOpen={this.state.duplicateOpen} onClose={this.handleOptionsClose}
+                       name={this.props.title} type={this.props.type}
+                       addMachine={this.props.addMachine} machines={this.props.machines} />
       <Card style={styles.card}>
         <CardActions
           style={{ ...styles.banner, backgroundColor: MachineColors[this.props.type] }}
@@ -150,7 +191,8 @@ class CardGrid extends React.Component {
       <Grid container spacing={16} style={{margin:16}}>
         {this.props.machines.map(x => (
           <Grid item>
-            <MachineCard title={x.title} type={x.type} todfa={this.props.todfa}/>
+            <MachineCard title={x.title} type={x.type} todfa={this.props.todfa}
+             addMachine={this.props.addMachine} machines={this.props.machines}/>
           </Grid>
         ))}
       </Grid>
@@ -227,11 +269,13 @@ class MachineSelectPage extends React.Component {
     ]
   }
 
-  addMachine = (type) => {
+  addMachine = (type, name) => {
     this.setState((prevState, props) => {
+      if (typeof name === "undefined")
+        name = `New ${type}`;
       return {
         machines: prevState.machines.concat([
-            { title: `New ${type}`, type: type }
+            { title: name, type: type }
         ])
       };
     });
@@ -241,7 +285,7 @@ class MachineSelectPage extends React.Component {
     return (
         <div>
           <ADAMToolbar title="Select a Machine" />
-          <CardGrid todfa={this.props.todfa} machines={this.state.machines}/>
+          <CardGrid todfa={this.props.todfa} addMachine={this.addMachine} machines={this.state.machines}/>
           <AddMachineButton addMachine={this.addMachine}/>
         </div>
     );
