@@ -1,6 +1,5 @@
 import React from 'react';
 
-import machines from '../App.js';
 import ADAMToolbar from '../components/toolbar.js';
 
 import AddIcon from '@material-ui/icons/Add';
@@ -67,7 +66,7 @@ class CardGrid extends React.Component {
   render() {
     return (
       <Grid container spacing={16} style={{margin:16}}>
-        {machines.map(x => (
+        {this.props.machines.map(x => (
           <Grid item>
             <MachineCard title={x.title} type={x.type} todfa={this.props.todfa}/>
           </Grid>
@@ -87,19 +86,19 @@ class NewMachineDialog extends React.Component {
         <DialogTitle id="simple-dialog-title">Select a Machine Type</DialogTitle>
         <div>
           <List>
-            <ListItem button onClick={() => { machines.addMachine("dfa"); this.props.onClose(); }}>
+            <ListItem button onClick={() => { this.props.addMachine("dfa"); this.props.onClose(); }}>
               <ListItemAvatar>
                 <Avatar style={{backgroundColor: MachineColors["dfa"]}} children={smallText("DFA")} />
               </ListItemAvatar>
               <ListItemText primary="New DFA"/>
             </ListItem>
-            <ListItem button onClick={() => { machines.addMachine("nfa"); this.props.onClose(); }}>
+            <ListItem button onClick={() => { this.props.addMachine("nfa"); this.props.onClose(); }}>
               <ListItemAvatar>
               <Avatar style={{backgroundColor: MachineColors["nfa"]}} children={smallText("NFA")}   />
               </ListItemAvatar>
               <ListItemText primary="New NFA"/>
             </ListItem>
-            <ListItem button onClick={() => { machines.addMachine("tm"); this.props.onClose(); }}>
+            <ListItem button onClick={() => { this.props.addMachine("tm"); this.props.onClose(); }}>
               <ListItemAvatar>
               <Avatar style={{backgroundColor: MachineColors["tm"]}} children={smallText("TM")} />
               </ListItemAvatar>
@@ -130,19 +129,38 @@ class AddMachineButton extends React.Component {
                 style={{ right: 20, bottom: 20, position: 'fixed'}}>
           <AddIcon />
         </Button>
-        <NewMachineDialog open={this.state.open} onClose={this.handleClose} />
+        <NewMachineDialog open={this.state.open} onClose={this.handleClose} addMachine={this.props.addMachine} />
       </div>
     );
   }
 }
 
 class MachineSelectPage extends React.Component {
+  state = {
+    machines: [
+      { title: "Sample DFA", type: "dfa" },
+      { title: "Sample NFA", type: "nfa" },
+      { title: "Sample TM", type: "tm" },
+      { title: "Another DFA", type: "dfa" }
+    ]
+  }
+
+  addMachine = (type) => {
+    this.setState((prevState, props) => {
+      return {
+        machines: prevState.machines.concat([
+            { title: `New ${type}`, type: type }
+        ])
+      };
+    });
+  };
+
   render() {
     return (
         <div>
           <ADAMToolbar title="Select a Machine" />
-          <CardGrid todfa={this.props.todfa} />
-          <AddMachineButton />
+          <CardGrid todfa={this.props.todfa} machines={this.state.machines}/>
+          <AddMachineButton addMachine={this.addMachine}/>
         </div>
     );
   }

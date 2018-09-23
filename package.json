@@ -8,7 +8,6 @@
     "material-ui-icons": "^1.0.0-beta.36",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
-    "react-easy-state": "^5.1.0",
     "react-scripts": "1.1.5"
   },
   "scripts": {
