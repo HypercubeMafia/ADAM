@@ -1,6 +1,8 @@
 import React from 'react';
 
 import ADAMToolbar from '../components/toolbar.js';
+import IconButton from "@material-ui/core/IconButton";
+import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
 
 import AddIcon from '@material-ui/icons/Add';
 import Avatar from '@material-ui/core/Avatar';
@@ -27,8 +29,8 @@ const styles = {
     fontSize: 14
   },
   banner: {
-    //paddingTop: 0,
-    //paddingBottom: 0
+    paddingTop: 0,
+    paddingBottom: 0
   },
   option: {
     marginLeft: "auto"
@@ -48,6 +50,12 @@ class MachineCard extends React.Component {
           <Typography variant="body2">
             {this.props.title.toUpperCase()}
           </Typography>
+          <IconButton
+          style={styles.option}
+          onClick={() => {window.location.href = "https://www.youtube.com/watch?v=rEq1Z0bjdwc"}}
+          >
+            <MoreHorizIcon />
+          </IconButton>
         </CardActions>
         <CardActionArea onClick={() => this.props.todfa(this.props.title)}>
           <CardContent >
