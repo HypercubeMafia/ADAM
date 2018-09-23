@@ -79,6 +79,7 @@ class DuplicateDialog extends React.Component {
   onSubmit = () => {
     var h = this.buildHintText(this.state.name);
     if (h === "") {
+      this.props.addMachine(this.props.type, this.state.name);
       this.props.onClose();
     } else {
       this.setState(
@@ -97,7 +98,7 @@ class DuplicateDialog extends React.Component {
           onClose={this.props.onClose}
           aria-labelledby="form-dialog-title"
         >
-          <DialogTitle id="form-dialog-title">Duplicate Machine</DialogTitle>
+          <DialogTitle id="form-dialog-title">Duplicating "{this.props.name}"</DialogTitle>
           <DialogContent>
             <DialogContentText>
               Enter the name of the new machine.
@@ -155,7 +156,8 @@ class MachineCard extends React.Component {
         </MenuItem>
       </Menu>
       <DuplicateDialog isOpen={this.state.duplicateOpen} onClose={this.handleOptionsClose}
-       addMachine={this.props.addMachine} machines={this.props.machines} />
+                       name={this.props.title} type={this.props.type}
+                       addMachine={this.props.addMachine} machines={this.props.machines} />
       <Card style={styles.card}>
         <CardActions
           style={{ ...styles.banner, backgroundColor: MachineColors[this.props.type] }}
