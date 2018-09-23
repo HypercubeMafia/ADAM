@@ -3,7 +3,8 @@ import React from 'react';
 import ADAMToolbar from '../components/toolbar.js';
 import IconButton from "@material-ui/core/IconButton";
 import MoreHorizIcon from "@material-ui/icons/MoreHoriz";
-
+import Menu from '@material-ui/core/Menu';
+import MenuItem from '@material-ui/core/MenuItem';
 import AddIcon from '@material-ui/icons/Add';
 import Avatar from '@material-ui/core/Avatar';
 import Button from '@material-ui/core/Button';
@@ -40,9 +41,30 @@ const styles = {
 var MachineColors = { dfa: "#7e57c2", nfa: "#ffa726", tm: "#42a5f5" };
 
 class MachineCard extends React.Component {
+  state = {
+    anchorEl: null,
+  };
+
+  handleOptionsClick = event => {
+    this.setState({ anchorEl: event.currentTarget });
+  };
+
+  handleOptionsClose = () => {
+    this.setState({ anchorEl: null });
+  };
+
   render() {
+    const { anchorEl } = this.state;
     return (
       <div>
+      <Menu
+        id="simple-menu"
+        anchorEl={anchorEl}
+        open={Boolean(anchorEl)}
+        onClose={this.handleOptionsClose}
+      >
+        <MenuItem onClick={this.handleOptionsClose}>Duplicate</MenuItem>
+      </Menu>
       <Card style={styles.card}>
         <CardActions
           style={{ ...styles.banner, backgroundColor: MachineColors[this.props.type] }}
@@ -52,7 +74,7 @@ class MachineCard extends React.Component {
           </Typography>
           <IconButton
           style={styles.option}
-          onClick={() => {window.location.href = "https://www.youtube.com/watch?v=rEq1Z0bjdwc"}}
+          onClick={this.handleOptionsClick}
           >
             <MoreHorizIcon />
           </IconButton>
