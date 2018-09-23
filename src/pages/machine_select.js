@@ -62,6 +62,12 @@ class DuplicateDialog extends React.Component {
       onChange={e => this.setState(
         { name: e.target.value, hintText: this.buildHintText(e.target.value) }
       )}
+      onKeyPress={(ev) => {
+        if (ev.key === 'Enter') {
+          this.onSubmit();
+          ev.preventDefault();
+        }
+      }}
       fullWidth
     />
   );
