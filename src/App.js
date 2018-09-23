@@ -8,8 +8,10 @@ class App extends React.Component {
     super(props);
     // Need to manually set state data at beginning,
     // or else it is null for first render call
-    this.state = { currentPage : "machine-select",
-              currentMachine : null  };
+    this.state = {
+      currentPage : "machine-select",
+      currentMachine : null,
+    };
     document.title = "ADAM: Another Drawer of Alan's Machines";
   }
 
