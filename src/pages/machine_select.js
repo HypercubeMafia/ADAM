@@ -13,12 +13,16 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Card from '@material-ui/core/Card';
 import Dialog from '@material-ui/core/Dialog';
+import DialogActions from '@material-ui/core/DialogActions';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import Grid from '@material-ui/core/Grid';
 import List from '@material-ui/core/List';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemText from '@material-ui/core/ListItemText';
+import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
 
 const styles = {
@@ -40,18 +44,63 @@ const styles = {
 
 var MachineColors = { dfa: "#7e57c2", nfa: "#ffa726", tm: "#42a5f5" };
 
+class DuplicateDialog extends React.Component {
+  render() {
+    return (
+      <Dialog
+          open={this.props.isOpen}
+          onClose={this.props.onClose}
+          aria-labelledby="form-dialog-title"
+        >
+          <DialogTitle id="form-dialog-title">Duplicate Machine</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Enter the name of the new machine.
+            </DialogContentText>
+            <TextField
+              autoFocus
+              margin="dense"
+              id="name"
+              placeholder="Machine Name"
+              type="string"
+              fullWidth
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.props.onClose} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={this.handleClose} color="primary">
+              Submit
+            </Button>
+          </DialogActions>
+        </Dialog>
+    )
+  }
+}
+
 class MachineCard extends React.Component {
   state = {
     anchorEl: null,
+    duplicateOpen: false,
   };
 
   handleOptionsClick = event => {
-    this.setState({ anchorEl: event.currentTarget });
+    this.setState({ anchorEl: event.currentTarget, duplicateOpen: false });
   };
 
   handleOptionsClose = () => {
-    this.setState({ anchorEl: null });
+    this.setState({ anchorEl: null, duplicateOpen: false });
   };
+
+  openDuplicate = () => {
+    this.setState( (prevState, props) => {
+      return {
+        duplicateOpen: true,
+        anchorEl: prevState.anchorEl
+      };
+    });
+  }
 
   render() {
     const { anchorEl } = this.state;
@@ -63,8 +112,11 @@ class MachineCard extends React.Component {
         open={Boolean(anchorEl)}
         onClose={this.handleOptionsClose}
       >
-        <MenuItem onClick={this.handleOptionsClose}>Duplicate</MenuItem>
+        <MenuItem onClick={this.openDuplicate} onClose={this.onClose}>
+          Duplicate
+        </MenuItem>
       </Menu>
+      <DuplicateDialog isOpen={this.state.duplicateOpen} onClose={this.handleOptionsClose}/>
       <Card style={styles.card}>
         <CardActions
           style={{ ...styles.banner, backgroundColor: MachineColors[this.props.type] }}
