@@ -1,11 +1,23 @@
-import React from "react";
-import Card from "@material-ui/core/Card";
-import CardActionArea from "@material-ui/core/CardActionArea";
-import CardActions from "@material-ui/core/CardActions";
-import CardContent from "@material-ui/core/CardContent";
-import Grid from "@material-ui/core/Grid";
-import Typography from "@material-ui/core/Typography";
+import React from 'react';
+
+import machines from '../App.js';
 import ADAMToolbar from '../components/toolbar.js';
+
+import AddIcon from '@material-ui/icons/Add';
+import Avatar from '@material-ui/core/Avatar';
+import Button from '@material-ui/core/Button';
+import CardActionArea from '@material-ui/core/CardActionArea';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import Card from '@material-ui/core/Card';
+import Dialog from '@material-ui/core/Dialog';
+import DialogTitle from '@material-ui/core/DialogTitle';
+import Grid from '@material-ui/core/Grid';
+import List from '@material-ui/core/List';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import Typography from '@material-ui/core/Typography';
 
 const styles = {
   card: {
@@ -23,13 +35,6 @@ const styles = {
     marginLeft: "auto"
   }
 };
-
-var machines = [
-  { title: "Sample DFA", type: "dfa" },
-  { title: "Sample NFA", type: "nfa" },
-  { title: "Sample TM", type: "tm" },
-  { title: "Another DFA", type: "dfa" }
-];
 
 var MachineColors = { dfa: "#7e57c2", nfa: "#ffa726", tm: "#42a5f5" };
 
@@ -72,13 +77,72 @@ class CardGrid extends React.Component {
   }
 }
 
+class NewMachineDialog extends React.Component {
+  render() {
+    const { classes, onClose, selectedValue, ...other } = this.props;
+    let smallText = (string) => <p style={{fontSize:"85%"}}>{string}</p>;
+
+    return (
+      <Dialog onClose={this.props.onClose} aria-labelledby="simple-dialog-title" {...other}>
+        <DialogTitle id="simple-dialog-title">Select a Machine Type</DialogTitle>
+        <div>
+          <List>
+            <ListItem button onClick={() => { machines.addMachine("dfa"); this.props.onClose(); }}>
+              <ListItemAvatar>
+                <Avatar style={{backgroundColor: MachineColors["dfa"]}} children={smallText("DFA")} />
+              </ListItemAvatar>
+              <ListItemText primary="New DFA"/>
+            </ListItem>
+            <ListItem button onClick={() => { machines.addMachine("nfa"); this.props.onClose(); }}>
+              <ListItemAvatar>
+              <Avatar style={{backgroundColor: MachineColors["nfa"]}} children={smallText("NFA")}   />
+              </ListItemAvatar>
+              <ListItemText primary="New NFA"/>
+            </ListItem>
+            <ListItem button onClick={() => { machines.addMachine("tm"); this.props.onClose(); }}>
+              <ListItemAvatar>
+              <Avatar style={{backgroundColor: MachineColors["tm"]}} children={smallText("TM")} />
+              </ListItemAvatar>
+              <ListItemText primary="New Turing Machine"/>
+            </ListItem>
+          </List>
+        </div>
+      </Dialog>
+    );
+  }
+}
+
+class AddMachineButton extends React.Component {
+  state = { open: false };
+
+  handleOpen = () => {
+    this.setState({ open: true, });
+  };
+
+  handleClose = () => {
+    this.setState({ open: false });
+  };
+
+  render() {
+    return (
+      <div>
+        <Button onClick={this.handleOpen} variant="fab" color="primary"
+                style={{ right: 20, bottom: 20, position: 'fixed'}}>
+          <AddIcon />
+        </Button>
+        <NewMachineDialog open={this.state.open} onClose={this.handleClose} />
+      </div>
+    );
+  }
+}
+
 class MachineSelectPage extends React.Component {
   render() {
     return (
         <div>
           <ADAMToolbar title="Select a Machine" />
-          <CardGrid todfa={this.props.todfa}/>
-          {/*<AddMachineButton/>*/}
+          <CardGrid todfa={this.props.todfa} />
+          <AddMachineButton />
         </div>
     );
   }
