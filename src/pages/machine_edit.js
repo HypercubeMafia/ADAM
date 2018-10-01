@@ -1,7 +1,6 @@
 import React from "react";
 
 import Paper from '@material-ui/core/Paper';
-import Typography from '@material-ui/core/Typography';
 
 import ADAMToolbar from '../components/toolbar';
 
@@ -23,10 +22,21 @@ class MachineCanvas extends React.Component {
 
 
 class EditPage extends React.Component {
+  buttons = () => [
+    {
+      body: "Add State",
+      onClick: this.addState
+    }
+  ];
+
+  addState = () => {
+     console.log("Add State");
+  };
+
   render() {
     return (
     <div>
-      <ADAMToolbar title="EDIT" back={this.props.back} />
+      <ADAMToolbar title="EDIT" back={this.props.back} btns={this.buttons()}/>
 
       <Paper elevation={1} style={{margin:32, padding:16}}>
         <MachineCanvas />
