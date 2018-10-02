@@ -1,15 +1,9 @@
 import React from "react";
+import { Stage, Layer, Circle } from 'react-konva';
 
 import Paper from '@material-ui/core/Paper';
 
 import ADAMToolbar from '../components/toolbar';
-
-const styles = {
-  canvas : {
-    width : "100%",
-    height : 800
-  }
-}
 
 const PageStatus = {
   default : 1,
@@ -18,40 +12,23 @@ const PageStatus = {
 
 class MachineCanvas extends React.Component {
 
-  constructor(props) {
-    super(props);
-    this.handleClick = this.handleClick.bind(this);
-  }
-
   handleClick = event => {
     if (this.props.status === PageStatus.addState) {
-      console.log("("+event.pageX+","+event.pageY+")");
-      this.props.addState(event.pageX,event.pageY);
+      this.props.addState(event.evt.offsetX,event.evt.offsetY);
     }
   };
 
-  componentDidMount() {
-    this.refs.canvas.addEventListener('click', this.handleClick);
-  }
-
-  componentWillUnmount() {
-    this.refs.canvas.removeEventListener('click', this.handleClick);
-  }
-
-  componentDidUpdate() {
-    const machine = this.props.machine;
-    for(var i=0; i < machine.states.length; ++i){
-      const state = machine.states[i];
-      const ctx = this.refs.canvas.getContext("2d");
-      ctx.beginPath();
-      ctx.arc(state.x, state.y, 10, 0, 2 * Math.PI);
-      ctx.stroke();
-    }
-  }
-
   render() {
+    const states = this.props.machine.states;
+
     return (
-      <canvas ref="canvas" style={styles.canvas} />
+      <Stage ref="stage" width={window.innerWidth} height={600} onClick={this.handleClick}>
+        <Layer>
+          {states ? states.map(state => (
+            <Circle x={state.x} y={state.y} radius={40} stroke="black" />
+          )) : null}
+        </Layer>
+      </Stage>
     )
   }
 }
@@ -96,7 +73,7 @@ class EditPage extends React.Component {
     return (
       <div>
         <ADAMToolbar title="EDIT" back={this.props.back} btns={this.buttons()} />
-        <Paper elevation={1} style={{margin:32, padding:16}}>
+        <Paper elevation={1} style={{margin:32, padding:0}}>
           <MachineCanvas machine={this.state.machine} status={this.state.status} addState={this.addState}/>
         </Paper>
       </div>
