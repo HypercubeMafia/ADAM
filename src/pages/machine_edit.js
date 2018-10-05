@@ -1,4 +1,5 @@
 import React from "react";
+import ReactDOM from 'react-dom';
 import { Stage, Layer, Circle } from 'react-konva';
 
 import Paper from '@material-ui/core/Paper';
@@ -10,7 +11,74 @@ const PageStatus = {
   addState : 2
 }
 
+class State extends React.Component {
+  state = { s: this.props.state }
+
+  handleDragEnd = e => {
+    this.setState({
+      s: {
+        x: e.target.x(),
+        y: e.target.y()
+      }
+    });
+  };
+
+  dragBound = pos => {
+    const w = this.props.size.width;
+    const h = this.props.size.height;
+
+    const r = 45;
+
+    const x = pos.x < r ? r : pos.x > w-r ? w-r : pos.x ;
+    const y = pos.y < r ? r : pos.y > h-r ? h-r : pos.y ;
+    return {x:x, y:y};
+  }
+
+  render() {
+    return (
+      <Circle ref={"circle"}
+        x = {this.state.s.x}
+        y = {this.state.s.y}
+        radius = {40}
+        stroke = "black"
+        draggable
+        dragBoundFunc = {this.dragBound}
+        onDragEnd = {this.handleDragEnd}
+      />
+    )
+  }
+}
+
 class MachineCanvas extends React.Component {
+
+  state = {
+    width: 1000,
+    height: 600
+  }
+
+  updateDimensions() {
+    const w = /*this.refs.stg.parentNode.offsetWidth;*/ReactDOM.findDOMNode(this).parentNode.offsetWidth;
+    const h = /*this.refs.stg.parentNode.offsetHeight;*/ReactDOM.findDOMNode(this).parentNode.offsetHeight;
+
+    this.setState({width: w, height: h});
+    //console.log(`window.width = ${window.width}, window.height = ${window.height}`);
+    //this.setState({width: window.width, height: window.height});
+
+  }
+
+  // componentWillMount() {
+  //   this.updateDimensions();
+  // }
+
+   componentDidMount() {
+     this.updateDimensions();
+     window.addEventListener("resize", () => this.updateDimensions());
+   }
+
+   componentWillUnmount() {
+     window.removeEventListener("resize", () => this.updateDimensions());
+   }
+
 
   handleClick = event => {
     if (this.props.status === PageStatus.addState) {
@@ -22,17 +90,14 @@ class MachineCanvas extends React.Component {
     const states = this.props.machine.states;
 
     return (
-      <Stage ref="stage" width={window.innerWidth} height={600} onClick={this.handleClick}>
+      <Stage ref="stg" width={this.state.width} height={this.state.height} onClick={this.handleClick}>
         <Layer>
-          {states ? states.map(state => (
-            <Circle x={state.x} y={state.y} radius={40} stroke="black" />
-          )) : null}
+          {states ? states.map( s => (<State state={s} size={this.state} />) ) : null}
         </Layer>
       </Stage>
     )
   }
 }
-
 
 class EditPage extends React.Component {
   state = {
@@ -49,14 +114,7 @@ class EditPage extends React.Component {
     }
   ];
 
-  setPageStatus = (status) => {
-    this.setState((prevState, props) => {
-      return {
-        status: status,
-        machine: prevState.machine
-      };
-    })
-  };
+  setPageStatus = status => this.setState({ status: status });
 
   addState = (x,y) => {
       this.setState((prevState, props) => {
