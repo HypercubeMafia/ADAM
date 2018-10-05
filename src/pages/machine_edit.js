@@ -5,21 +5,42 @@ import { Stage, Layer, Circle } from 'react-konva';
 import Paper from '@material-ui/core/Paper';
 
 import ADAMToolbar from '../components/toolbar';
+import State from '../machine/state';
 
 const PageStatus = {
   default : 1,
   addState : 2
 }
 
+
 class State extends React.Component {
   state = { s: this.props.state }
 
   handleDragEnd = e => {
-    this.setState({
-      s: {
-        x: e.target.x(),
-        y: e.target.y()
-      }
+    this.setState( (prevState, props) => {
+      return(
+        {
+          s: {
+            x: e.target.x(),
+            y: e.target.y(),
+            clicked: prevState.s.clicked
+          }
+        }
+      )
+    });
+  };
+
+  handleClick = () => {
+    this.setState( (prevState, props) => {
+      return(
+        {
+          s: {
+            x: prevState.s.x,
+            y: prevState.s.y,
+            clicked: !(prevState.s.clicked)
+          }
+        }
+      )
     });
   };
 
@@ -36,14 +57,16 @@ class State extends React.Component {
 
   render() {
     return (
-      <Circle ref={"circle"}
+      <Circle
         x = {this.state.s.x}
         y = {this.state.s.y}
         radius = {40}
-        stroke = "black"
+        stroke = {this.state.s.clicked ? "green" : "black"}
+        strokeWidth = {this.state.s.clicked ? 2 : 1}
         draggable
         dragBoundFunc = {this.dragBound}
         onDragEnd = {this.handleDragEnd}
+        onClick = {this.handleClick}
       />
     )
   }
@@ -57,18 +80,11 @@ class MachineCanvas extends React.Component {
   }
 
   updateDimensions() {
-    const w = /*this.refs.stg.parentNode.offsetWidth;*/ReactDOM.findDOMNode(this).parentNode.offsetWidth;
-    const h = /*this.refs.stg.parentNode.offsetHeight;*/ReactDOM.findDOMNode(this).parentNode.offsetHeight;
+    const w = ReactDOM.findDOMNode(this).parentNode.offsetWidth;
+    const h = ReactDOM.findDOMNode(this).parentNode.offsetHeight;
 
     this.setState({width: w, height: h});
-    //console.log(`window.width = ${window.width}, window.height = ${window.height}`);
-    //this.setState({width: window.width, height: window.height});
-
   }
-
-  // componentWillMount() {
-  //   this.updateDimensions();
-  // }
 
    componentDidMount() {
      this.updateDimensions();
@@ -119,13 +135,14 @@ class EditPage extends React.Component {
   addState = (x,y) => {
       this.setState((prevState, props) => {
         var s = prevState.machine.states;
-        s.push({ x:x, y:y });
+        s.push({ x:x, y:y, clicked:false });
         return {
           status: PageStatus.default,
           machine: { states: s }
         };
       })
   };
+
 
   render() {
     return (
@@ -138,6 +155,5 @@ class EditPage extends React.Component {
     );
   }
 }
-
 
 export default EditPage;
