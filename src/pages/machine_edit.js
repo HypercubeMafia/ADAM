@@ -17,7 +17,7 @@ class MachineCanvas extends React.Component {
 
   state = {
     width: 1000,
-    height: 600
+    height: 600,
   }
 
   updateDimensions() {
@@ -36,27 +36,29 @@ class MachineCanvas extends React.Component {
   }
 
   clickState = (state) => {
-    state.setState( (prevState, props) => {
-      return ({
-        s: {
-          x: prevState.s.x,
-          y: prevState.s.y,
-          clicked: !(prevState.s.clicked)
-        }
-      })
-    });
-  }
+    if (state.state.s.clicked) {
+      //this state is currently selected, unselect and return to default page status
+      state.setState( (prevState, props) => ({
+        s: { ...prevState.s, clicked: false }
+      }));
+      this.props.setPageStatus(PageStatus.default);
+    } else {
+      //this state is currently unselected, so we should select it
+      if (this.props.pageState.status === PageStatus.stateSelected) {
+        //another state is selected, we first return the page to the default state
+        this.props.toDefault();
+      }
+      state.setState( (prevState, props) => ({
+        s: { ...prevState.s, clicked: true }
+      }));
+      this.props.setPageStatus(PageStatus.stateSelected);
+    }
+  };
 
   dragState = (e,state) => {
-    state.setState( (prevState, props) => {
-      return({
-        s: {
-          x: e.target.x(),
-          y: e.target.y(),
-          clicked: prevState.s.clicked
-        }
-      })
-    });
+    state.setState( (prevState, props) => ({
+      s: { ...prevState.s, x: e.target.x(), y: e.target.y() }
+    }));
   };
 
   handleClick = event => {
@@ -71,7 +73,9 @@ class MachineCanvas extends React.Component {
     return (
       <Stage ref="stg" width={this.state.width} height={this.state.height} onClick={this.handleClick}>
         <Layer>
-          {states ? states.map( s => (<State state={s} size={this.state} onClick={this.clickState} onDragEnd={this.dragState} />) ) : null}
+          {states ? states.map( s => (
+            <State state={s} size={this.state} onClick={this.clickState} onDragEnd={this.dragState} />
+          )) : null}
         </Layer>
       </Stage>
     )
@@ -83,8 +87,7 @@ class EditPage extends React.Component {
     status : PageStatus.default, //current action being performed
     machine : { // machine description
       states : []
-    },
-    selectedState : null
+    }
   };
 
   buttons = () => [
@@ -94,25 +97,45 @@ class EditPage extends React.Component {
     }
   ];
 
+
   setPageStatus = status => this.setState({ status: status });
 
   addState = (x,y) => {
-      this.setState((prevState, props) => {
-        var s = prevState.machine.states;
-        s.push({ x:x, y:y, clicked:false });
-        return {
-          status: PageStatus.default,
-          machine: { states: s }
-        };
-      })
+    this.setState((prevState, props) => {
+      var s = prevState.machine.states;
+      s.push({ x:x, y:y, clicked:false });
+      return {
+        status: PageStatus.default,
+        machine: { states: s }
+      };
+    })
+  };
+
+  toDefault = () => {
+    this.setState((prevState, props) => ({
+      status: PageStatus.default,
+      machine : {
+        states: prevState.machine.states.map( s => ({ ...s, clicked:false }) )
+      }
+    }));
   };
 
   render() {
+    var main_toolbar = (<ADAMToolbar title="EDIT" back={this.props.back} btns={this.buttons()} />);
+    var state_toolbar = (<ADAMToolbar title="MODIFY STATE" back={this.toDefault} />);
+
+    var toolbar = this.state.status === PageStatus.stateSelected ? state_toolbar : main_toolbar;
+
     return (
       <div>
-        <ADAMToolbar title="EDIT" back={this.props.back} btns={this.buttons()} />
+        {toolbar}
         <Paper elevation={1} style={{margin:32, padding:0}}>
-          <MachineCanvas pageState={this.state} addState={this.addState}/>
+          <MachineCanvas
+            pageState={this.state}
+            addState={this.addState}
+            setPageStatus={this.setPageStatus}
+            toDefault={this.toDefault}
+          />
         </Paper>
       </div>
     );
