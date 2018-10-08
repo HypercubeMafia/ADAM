@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { Stage, Layer, Circle } from 'react-konva';
 
 import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
 
 import ADAMToolbar from '../components/toolbar';
 
@@ -107,6 +108,15 @@ class EditPage extends React.Component {
     }
   };
 
+  getModeText = () => {
+    switch(this.state.status){
+      case PageStatus.default:
+        return '\u200b';
+      case PageStatus.addState:
+        return "Click on the canvas to draw a state.";
+    }
+  }
+
   buttons = () => [
     {
       body: "Add State",
@@ -131,6 +141,13 @@ class EditPage extends React.Component {
     return (
       <div>
         <ADAMToolbar title="EDIT" back={this.props.back} btns={this.buttons()} />
+
+        <Paper elevation={1} style={{margin:32, padding:0}}>
+          <Typography variant="headline" component="h3">
+            {this.getModeText()}
+          </Typography>
+      </Paper>
+
         <Paper elevation={1} style={{margin:32, padding:0}}>
           <MachineCanvas machine={this.state.machine} status={this.state.status} addState={this.addState}/>
         </Paper>
