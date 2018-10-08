@@ -160,6 +160,9 @@ class MachineCard extends React.Component {
         <MenuItem onClick={this.openDuplicate} onClose={this.onClose}>
           Duplicate
         </MenuItem>
+        <MenuItem onClick={() => alert('Boop!')} onClose={this.onClose}>
+          Delete
+        </MenuItem>
       </Menu>
       <DuplicateDialog isOpen={this.state.duplicateOpen} onClose={this.handleOptionsClose}
                        name={this.props.title} type={this.props.type}
