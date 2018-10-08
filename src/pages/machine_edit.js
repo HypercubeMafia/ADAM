@@ -2,6 +2,7 @@ import React from "react";
 import update from 'immutability-helper';
 
 import Paper from '@material-ui/core/Paper';
+import Typography from '@material-ui/core/Typography';
 
 import ADAMToolbar from '../components/toolbar';
 import MachineCanvas from '../components/machine_canvas';
@@ -22,6 +23,15 @@ class EditPage extends React.Component {
     clickedState : -1, //state which is currently clicked, -1 for no state
     startState : -1 //-1 for no state
   };
+
+  getModeText = () => {
+    switch(this.state.status){
+      case PageStatus.default:
+        return '\u200b';
+      case PageStatus.addState:
+        return "Click on the canvas to draw a state.";
+    }
+  }
 
   buttons = () => [
     {
@@ -87,6 +97,13 @@ class EditPage extends React.Component {
     return (
       <div>
         {toolbar}
+
+        <Paper elevation={1} style={{margin:32, padding:0}}>
+          <Typography variant="headline" component="h3">
+            {this.getModeText()}
+          </Typography>
+        </Paper>
+
         <Paper elevation={1} style={{margin:32, padding:0}}>
           <MachineCanvas
             machine={this.state.machine}
