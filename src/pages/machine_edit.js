@@ -111,7 +111,7 @@ class EditPage extends React.Component {
   getModeText = () => {
     switch(this.state.status){
       case PageStatus.default:
-        return "";
+        return '\u200b';
       case PageStatus.addState:
         return "Click on the canvas to draw a state.";
     }
