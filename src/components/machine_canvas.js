@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from 'react-dom';
-import { Stage, Layer } from 'react-konva';
+import { Stage } from 'react-konva';
 
 import State from './machine/state';
 
@@ -28,16 +28,15 @@ class MachineCanvas extends React.Component {
   render() {
     return (
       <Stage width={this.state.width} height={this.state.height} onClick={this.props.onClick}>
-        <Layer>
           {this.props.machine.states.map( (s,i) => (
             <State
               state={s} size={this.state}
               clicked={i === this.props.clickedState}
+              start={i === this.props.startState}
               onClick={() => this.props.onStateClick(i)}
               onDragEnd={(e) => this.props.onStateDrag(e,i)}
             />
           ))}
-        </Layer>
       </Stage>
     )
   }

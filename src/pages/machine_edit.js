@@ -19,7 +19,8 @@ class EditPage extends React.Component {
     machine : { // machine description
       states : []
     },
-    clickedState : -1 //state which is currently clicked, -1 for no state
+    clickedState : -1, //state which is currently clicked, -1 for no state
+    startState : -1 //-1 for no state
   };
 
   buttons = () => [
@@ -77,7 +78,7 @@ class EditPage extends React.Component {
       btns={[
         {
           body: "Make Start State",
-          onClick: () => console.log("Make Start State")
+          onClick: () => this.setState({ startState: this.state.clickedState })
         }
       ]} />);
 
@@ -90,6 +91,7 @@ class EditPage extends React.Component {
           <MachineCanvas
             machine={this.state.machine}
             clickedState={this.state.clickedState}
+            startState={this.state.startState}
             onClick={this.handleCanvasClick}
             onStateClick={this.handleStateClick}
             onStateDrag={this.handleStateDrag}
