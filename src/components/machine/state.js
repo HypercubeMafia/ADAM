@@ -2,13 +2,6 @@ import React from "react";
 import { Circle } from 'react-konva';
 
 class State extends React.Component {
-  state = { s: this.props.state }
-
-  componentWillReceiveProps(nextProps) {
-     if(nextProps.state !== this.props.state) {
-       this.setState({s: nextProps.state});
-     }
-   }
 
   dragBound = pos => {
     const w = this.props.size.width;
@@ -24,15 +17,15 @@ class State extends React.Component {
   render() {
     return (
       <Circle
-        x = {this.state.s.x}
-        y = {this.state.s.y}
+        x = {this.props.state.x}
+        y = {this.props.state.y}
         radius = {40}
-        stroke = {this.state.s.clicked ? "green" : "black"}
-        strokeWidth = {this.state.s.clicked ? 3 : 1}
+        stroke = {this.props.clicked ? "green" : "black"}
+        strokeWidth = {this.props.clicked ? 3 : 1}
         draggable
         dragBoundFunc = {this.dragBound}
-        onDragEnd = {(e) => this.props.onDragEnd(e,this)}
-        onClick = {() => this.props.onClick(this)}
+        onDragEnd = {this.props.onDragEnd}
+        onClick = {this.props.onClick}
       />
     )
   }
