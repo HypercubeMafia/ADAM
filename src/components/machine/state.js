@@ -4,7 +4,7 @@ import { Layer, Circle, Arrow, Text } from 'react-konva';
 class State extends React.Component {
   radius = 40;
 
-  dragBound = pos => {
+  dragBound = pos => { //function which ensures state is not dragged off of canvas
     const w = this.props.size.width;
     const h = this.props.size.height;
 
@@ -16,6 +16,7 @@ class State extends React.Component {
   }
 
   render() {
+    //if we are the start state, this holds the start label
     var startLabel = this.props.start ?
       (<Text
         x={this.props.state.x-this.radius-80}
@@ -25,6 +26,7 @@ class State extends React.Component {
       />)
     : null;
 
+    //if we are the start state, this holds the start arrow
     var startArrow = this.props.start ?
       (<Arrow
         points={[this.props.state.x-this.radius-40, this.props.state.y,
@@ -43,8 +45,8 @@ class State extends React.Component {
           x = {this.props.state.x}
           y = {this.props.state.y}
           radius = {this.radius}
-          stroke = {this.props.clicked ? "green" : "black"}
-          strokeWidth = {this.props.clicked ? 3 : 1}
+          stroke = {this.props.clicked ? "green" : "black"} //green on select
+          strokeWidth = {this.props.clicked ? 3 : 1} //thicker on select
           draggable
           dragBoundFunc = {this.dragBound}
           onDragEnd = {this.props.onDragEnd}

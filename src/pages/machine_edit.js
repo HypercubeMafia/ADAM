@@ -45,7 +45,7 @@ class EditPage extends React.Component {
       this.setState({
         machine:
           update(this.state.machine, {states: {
-            $push: [{x:e.evt.offsetX, y:e.evt.offsetY}]
+            $push: [{x:e.evt.offsetX, y:e.evt.offsetY}] // add a state centered at the click location to states array
           }}),
         status: PageStatus.default //return to default page status
       });
@@ -69,7 +69,7 @@ class EditPage extends React.Component {
   handleStateDrag = (e,i) => {
     this.setState({
       machine: update(this.state.machine, {states: {[i]: {
-        $merge: {x: e.target.x(), y: e.target.y()}
+        $merge: {x: e.target.x(), y: e.target.y()}  //set the location of the state to be the end location of the drag
       }}})
     });
   }
@@ -109,9 +109,9 @@ class EditPage extends React.Component {
             machine={this.state.machine}
             clickedState={this.state.clickedState}
             startState={this.state.startState}
-            onClick={this.handleCanvasClick}
-            onStateClick={this.handleStateClick}
-            onStateDrag={this.handleStateDrag}
+            onClick={this.handleCanvasClick} //handle canvas click (for add state)
+            onStateClick={this.handleStateClick} //handles state click (for highlighting)
+            onStateDrag={this.handleStateDrag} //handles state drag (to move state)
           />
         </Paper>
       </div>
