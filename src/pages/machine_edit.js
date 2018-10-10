@@ -1,103 +1,17 @@
 import React from "react";
-import ReactDOM from 'react-dom';
-import { Stage, Layer, Circle } from 'react-konva';
+import update from 'immutability-helper';
 
 import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 
 import ADAMToolbar from '../components/toolbar';
+import MachineCanvas from '../components/machine_canvas';
+
 
 const PageStatus = {
   default : 1,
-  addState : 2
-}
-
-class State extends React.Component {
-  state = { s: this.props.state }
-
-  handleDragEnd = e => {
-    this.setState({
-      s: {
-        x: e.target.x(),
-        y: e.target.y()
-      }
-    });
-  };
-
-  dragBound = pos => {
-    const w = this.props.size.width;
-    const h = this.props.size.height;
-
-    const r = 45;
-
-    const x = pos.x < r ? r : pos.x > w-r ? w-r : pos.x ;
-    const y = pos.y < r ? r : pos.y > h-r ? h-r : pos.y ;
-    return {x:x, y:y};
-  }
-
-  render() {
-    return (
-      <Circle ref={"circle"}
-        x = {this.state.s.x}
-        y = {this.state.s.y}
-        radius = {40}
-        stroke = "black"
-        draggable
-        dragBoundFunc = {this.dragBound}
-        onDragEnd = {this.handleDragEnd}
-      />
-    )
-  }
-}
-
-class MachineCanvas extends React.Component {
-
-  state = {
-    width: 1000,
-    height: 600
-  }
-
-  updateDimensions() {
-    const w = /*this.refs.stg.parentNode.offsetWidth;*/ReactDOM.findDOMNode(this).parentNode.offsetWidth;
-    const h = /*this.refs.stg.parentNode.offsetHeight;*/ReactDOM.findDOMNode(this).parentNode.offsetHeight;
-
-    this.setState({width: w, height: h});
-    //console.log(`window.width = ${window.width}, window.height = ${window.height}`);
-    //this.setState({width: window.width, height: window.height});
-
-  }
-
-  // componentWillMount() {
-  //   this.updateDimensions();
-  // }
-
-   componentDidMount() {
-     this.updateDimensions();
-     window.addEventListener("resize", () => this.updateDimensions());
-   }
-
-   componentWillUnmount() {
-     window.removeEventListener("resize", () => this.updateDimensions());
-   }
-
-
-  handleClick = event => {
-    if (this.props.status === PageStatus.addState) {
-      this.props.addState(event.evt.offsetX,event.evt.offsetY);
-    }
-  };
-
-  render() {
-    const states = this.props.machine.states;
-
-    return (
-      <Stage ref="stg" width={this.state.width} height={this.state.height} onClick={this.handleClick}>
-        <Layer>
-          {states ? states.map( s => (<State state={s} size={this.state} />) ) : null}
-        </Layer>
-      </Stage>
-    )
-  }
+  addState : 2,
+  stateSelected : 3,
 }
 
 class EditPage extends React.Component {
@@ -105,56 +19,104 @@ class EditPage extends React.Component {
     status : PageStatus.default, //current action being performed
     machine : { // machine description
       states : []
-    }
+    },
+    clickedState : -1, //state which is currently clicked, -1 for no state
+    startState : -1 //-1 for no state
   };
 
   getModeText = () => {
     switch(this.state.status){
-      case PageStatus.default:
-        return '\u200b';
       case PageStatus.addState:
         return "Click on the canvas to draw a state.";
+      default:
+        return '\u200b';
     }
   }
 
   buttons = () => [
     {
       body: "Add State",
-      onClick: () => this.setPageStatus(PageStatus.addState)
+      onClick: () => this.setState({ status: PageStatus.addState })
     }
   ];
 
-  setPageStatus = status => this.setState({ status: status });
+  handleCanvasClick = e => {
+    if (this.state.status === PageStatus.addState) {
+      this.setState({
+        machine:
+          update(this.state.machine, {states: {
+            $push: [{x:e.evt.offsetX, y:e.evt.offsetY}] // add a state centered at the click location to states array
+          }}),
+        status: PageStatus.default //return to default page status
+      });
+    }
+  }
 
-  addState = (x,y) => {
-      this.setState((prevState, props) => {
-        var s = prevState.machine.states;
-        s.push({ x:x, y:y });
-        return {
-          status: PageStatus.default,
-          machine: { states: s }
-        };
-      })
-  };
+  handleStateClick = i => {
+    if (this.state.clickedState === i) { //this state is currently selected, so we unselect it
+      this.setState({
+        status: PageStatus.default, //return to default page status
+        clickedState: -1 //no state is currently clicked
+      });
+    } else { //this state is currently unselected
+      this.setState({
+        status: PageStatus.stateSelected, //now in state selected page status
+        clickedState: i //indicate that this state has been clicked
+      });
+    }
+  }
+
+  handleStateDrag = (e,i) => {
+    this.setState({
+      machine: update(this.state.machine, {states: {[i]: {
+        $merge: {x: e.target.x(), y: e.target.y()}  //set the location of the state to be the end location of the drag
+      }}})
+    });
+  }
 
   render() {
+    var main_toolbar = ( <ADAMToolbar title="EDIT" back={this.props.back}
+      btns={[
+        {
+          body: "Add State",
+          onClick: () => this.setState({ status: PageStatus.addState })
+        },
+      ]} />);
+
+    var state_toolbar = ( <ADAMToolbar title="MODIFY STATE"
+      back={() => this.setState({ status: PageStatus.default, clickedState: -1 }) }
+      btns={[
+        {
+          body: "Make Start State",
+          onClick: () => this.setState({ startState: this.state.clickedState })
+        }
+      ]} />);
+
+    var toolbar = this.state.status === PageStatus.stateSelected ? state_toolbar : main_toolbar;
+
     return (
       <div>
-        <ADAMToolbar title="EDIT" back={this.props.back} btns={this.buttons()} />
+        {toolbar}
 
         <Paper elevation={1} style={{margin:32, padding:0}}>
           <Typography variant="headline" component="h3">
             {this.getModeText()}
           </Typography>
-      </Paper>
+        </Paper>
 
         <Paper elevation={1} style={{margin:32, padding:0}}>
-          <MachineCanvas machine={this.state.machine} status={this.state.status} addState={this.addState}/>
+          <MachineCanvas
+            machine={this.state.machine}
+            clickedState={this.state.clickedState}
+            startState={this.state.startState}
+            onClick={this.handleCanvasClick} //handle canvas click (for add state)
+            onStateClick={this.handleStateClick} //handles state click (for highlighting)
+            onStateDrag={this.handleStateDrag} //handles state drag (to move state)
+          />
         </Paper>
       </div>
     );
   }
 }
-
 
 export default EditPage;
