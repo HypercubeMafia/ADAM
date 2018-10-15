@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { Stage } from 'react-konva';
 
 import State from './machine/state';
-
+import Comment from './machine/comment';
 class MachineCanvas extends React.Component {
   state = { //default values used until component loads
     width: 1000,
@@ -38,6 +38,14 @@ class MachineCanvas extends React.Component {
               onDragEnd={(e) => this.props.onStateDrag(e,i)} //function to call on state drag end
             />
           ))}
+	  {this.props.machine.comments.map( (s,i) => (
+            <Comment
+              comment={s} //object holding state attributes (currently just location)
+              size={this.state} //size of canvas, used to bound state's drag area
+              onDragEnd={(e) => this.props.onCommentDrag(e,i)} //function to call on state drag end
+	    />
+          ))
+	}
       </Stage>
     )
   }
