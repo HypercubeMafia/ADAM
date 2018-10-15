@@ -97,7 +97,7 @@ class EditPage extends React.Component {
   validateNewStateName = (name) => {
     if (name === "") return {canSubmit: true, helperText: ""};
 
-    var maxLength = 5;
+    var maxLength = 4;
     if (name.length > maxLength) {
         return {canSubmit: false, helperText: `Name must be less than ${maxLength} characters.`}
       }

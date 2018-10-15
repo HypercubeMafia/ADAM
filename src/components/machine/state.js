@@ -64,9 +64,9 @@ class State extends React.Component {
     var stateLabel = (<Text
         x={this.props.state.x-this.radius}
         width={2*this.radius}
-        y={this.props.state.y-11}
+        y={this.props.state.y-10}
         align="center"
-        fontSize={22}
+        fontSize={20}
         text={this.props.state.name}
     />);
 
