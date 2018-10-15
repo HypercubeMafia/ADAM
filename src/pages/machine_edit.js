@@ -155,9 +155,9 @@ class EditPage extends React.Component {
           body: "Add Comment",
           onClick: () => this.setState({ status: PageStatus.addComment })
         }
-      ]} />);
-      ]}
+      ]} 
     />);
+      
   }
 
   render() {
