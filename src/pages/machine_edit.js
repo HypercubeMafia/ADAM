@@ -6,7 +6,7 @@ import Typography from '@material-ui/core/Typography';
 
 import ADAMToolbar from '../components/toolbar';
 import MachineCanvas from '../components/machine_canvas';
-
+import NameStateDialog from '../components/name_state_dialog';
 
 const PageStatus = {
   default : 1,
@@ -22,6 +22,7 @@ class EditPage extends React.Component {
       startState : -1 //-1 for no state
     },
     clickedState : -1, //state which is currently clicked, -1 for no state
+    nameStateOpen: false
   };
 
   getModeText = () => {
@@ -45,7 +46,7 @@ class EditPage extends React.Component {
       this.setState({
         machine:
           update(this.state.machine, {states: {
-            $push: [{x:e.evt.offsetX, y:e.evt.offsetY, accepting:false}]
+            $push: [{x:e.evt.offsetX, y:e.evt.offsetY, accepting:false, name:""}]
             // add a state centered at the click location to states array
           }}),
         status: PageStatus.default //return to default page status
@@ -70,10 +71,44 @@ class EditPage extends React.Component {
   handleStateDrag = (e,i) => {
     this.setState({
       machine: update(this.state.machine, {states: {[i]: {
-        $merge: {x: e.target.children[0].x(), y: e.target.children[0].y()}
+      $merge: {x: e.target.children[0].x(), y: e.target.children[0].y()}
         //set the location of the state to be the end location of the drag
       }}})
     });
+  }
+
+  nameStateOpen = () => {
+    this.setState({nameStateOpen: true});
+  }
+
+  handleNameStateClose = () => {
+    this.setState({nameStateOpen: false});
+  }
+
+  handleNameStateSubmit = (name) => {
+    this.setState({
+      machine: update(this.state.machine, {states: {[this.state.clickedState]: {
+        $merge: {name:name}
+      }}}),
+      nameStateOpen: false});
+  }
+
+  // returns {canSubmit: bool, helperText: string}
+  validateNewStateName = (name) => {
+    if (name === "") return {canSubmit: true, helperText: ""};
+
+    let maxLength = 20;
+    if (name.length > maxLength) {
+        return {canSubmit: false, helperText: `Name must be less than ${maxLength} characters.`}
+      }
+
+    for (var i=0; i < this.state.machine.states.length; ++i) {
+      if (i !== this.state.clickedState && this.state.machine.states[i].name === name) {
+        return {canSubmit: true, helperText: "Warning: Name already in use."};
+      }
+    }
+
+    return {canSubmit: true, helperText: ""};
   }
 
   getStateToolbar = () => {
@@ -100,7 +135,7 @@ class EditPage extends React.Component {
         },
         {
           body: "Change Name",
-          onClick: () => console.log("Change Name clicked")
+          onClick: () => this.nameStateOpen()
         }
       ]}
     />);
@@ -147,6 +182,14 @@ class EditPage extends React.Component {
             onStateDrag={this.handleStateDrag} //handles state drag (to move state)
           />
         </Paper>
+
+      <NameStateDialog
+        isOpen={this.state.nameStateOpen}
+        onClose={this.handleNameStateClose}
+        onSubmit={this.handleNameStateSubmit}
+        validate={this.validateNewStateName}
+      />
+
       </div>
     );
   }
