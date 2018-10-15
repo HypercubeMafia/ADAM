@@ -15,6 +15,10 @@ class NameStateDialog extends React.Component {
     hintText: ""
   }
 
+  componentWillReceiveProps = () => {
+    this.setState({name: this.props.name});
+  }
+
   textField = () => (
     <TextField
       helperText={this.state.hintText}
@@ -23,6 +27,7 @@ class NameStateDialog extends React.Component {
       margin="dense"
       label="State Name"
       type="string"
+      value={this.state.name}
       onChange={e => this.setState(
         { name: e.target.value, hintText: this.props.validate(e.target.value).helperText }
       )}

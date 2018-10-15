@@ -97,7 +97,7 @@ class EditPage extends React.Component {
   validateNewStateName = (name) => {
     if (name === "") return {canSubmit: true, helperText: ""};
 
-    let maxLength = 20;
+    var maxLength = 5;
     if (name.length > maxLength) {
         return {canSubmit: false, helperText: `Name must be less than ${maxLength} characters.`}
       }
@@ -184,6 +184,7 @@ class EditPage extends React.Component {
         </Paper>
 
       <NameStateDialog
+        name={this.state.clickedState === -1 ? "" : this.state.machine.states[this.state.clickedState].name}
         isOpen={this.state.nameStateOpen}
         onClose={this.handleNameStateClose}
         onSubmit={this.handleNameStateSubmit}
