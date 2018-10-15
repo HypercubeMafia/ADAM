@@ -97,6 +97,10 @@ class EditPage extends React.Component {
               $set: !(this.state.machine.states[this.state.clickedState].accepting)
             }}}})
           })
+        },
+        {
+          body: "Change Name",
+          onClick: () => console.log("Change Name clicked")
         }
       ]}
     />);
