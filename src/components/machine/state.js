@@ -61,6 +61,15 @@ class State extends React.Component {
       />)
     : null;
 
+    var stateLabel = (<Text
+        x={this.props.state.x-this.radius}
+        width={2*this.radius}
+        y={this.props.state.y-10}
+        align="center"
+        fontSize={20}
+        text={this.props.state.name}
+    />);
+
     return (
       <Layer>
         <Group
@@ -69,10 +78,11 @@ class State extends React.Component {
           onDragEnd = {this.props.onDragEnd}
           onClick = {this.props.onClick}
         >
-          {stateCircle /*that has to be first child of the group*/} 
+          {stateCircle /*that has to be first child of the group*/}
           {acceptingCircle}
           {startLabel}
           {startArrow}
+          {stateLabel}
         </Group>
       </Layer>
     )
