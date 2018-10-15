@@ -33,7 +33,7 @@ class MachineCanvas extends React.Component {
               state={s} //object holding state attributes (currently just location)
               size={this.state} //size of canvas, used to bound state's drag area
               clicked={i === this.props.clickedState} //whether this is clicked state
-              start={i === this.props.startState} //whether this is start state
+              start={i === this.props.machine.startState} //whether this is start state
               onClick={() => this.props.onStateClick(i)} //function to call on state click
               onDragEnd={(e) => this.props.onStateDrag(e,i)} //function to call on state drag end
             />

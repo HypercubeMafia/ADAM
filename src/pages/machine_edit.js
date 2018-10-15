@@ -20,14 +20,12 @@ class EditPage extends React.Component {
     status : PageStatus.default, //current action being performed
     machine : { // machine description
       states : [],
+      startState : -1, //-1 for no state
       comments : []
-      
-    },
+    }, 
     clickedState : -1, //state which is currently clicked, -1 for no state
-    startState : -1, //-1 for no state
     isComment:false,
     clickState:null
-
   };
 
   getModeText = () => {
@@ -60,7 +58,8 @@ class EditPage extends React.Component {
       this.setState({
         machine:
           update(this.state.machine, {states: {
-            $push: [{x:e.evt.offsetX, y:e.evt.offsetY}] // add a state centered at the click location to states array
+            $push: [{x:e.evt.offsetX, y:e.evt.offsetY, accepting:false}]
+            // add a state centered at the click location to states array
           }}),
         status: PageStatus.default //return to default page status
       });
@@ -89,7 +88,8 @@ class EditPage extends React.Component {
   handleStateDrag = (e,i) => {
     this.setState({
       machine: update(this.state.machine, {states: {[i]: {
-        $merge: {x: e.target.x(), y: e.target.y()}  //set the location of the state to be the end location of the drag
+        $merge: {x: e.target.children[0].x(), y: e.target.children[0].y()}
+        //set the location of the state to be the end location of the drag
       }}})
     });
   }
@@ -116,29 +116,58 @@ class EditPage extends React.Component {
         this.setState({isComment: false,status:PageStatus.default});
   };
 
-  render() {
-    var main_toolbar = ( <ADAMToolbar title="EDIT" back={this.props.back}
+  getStateToolbar = () => {
+    return (<ADAMToolbar title="MODIFY STATE"
+      back={() => this.setState({ status: PageStatus.default, clickedState: -1 }) }
+      btns={[
+        {
+          body: "Make Start State",
+          onClick: () => this.setState({
+            machine: update(this.state.machine, {startState: {
+              $set: this.state.clickedState
+            }})
+          })
+        },
+        {
+          body: (this.state.machine.states[this.state.clickedState].accepting)
+            ? "Make Non-Accepting State"
+            : "Make Accepting State",
+          onClick: () => this.setState({
+            machine: update(this.state.machine, {states: {[this.state.clickedState]: {accepting: {
+              $set: !(this.state.machine.states[this.state.clickedState].accepting)
+            }}}})
+          })
+        }
+      ]}
+    />);
+  }
+
+  getMainToolbar = () => {
+    return (<ADAMToolbar
+      title="EDIT"
+      back={this.props.back}
       btns={[
         {
           body: "Add State",
           onClick: () => this.setState({ status: PageStatus.addState })
         },
-	{
+        {
           body: "Add Comment",
           onClick: () => this.setState({ status: PageStatus.addComment })
         }
       ]} />);
+      ]}
+    />);
+  }
 
-    var state_toolbar = ( <ADAMToolbar title="MODIFY STATE"
-      back={() => this.setState({ status: PageStatus.default, clickedState: -1 }) }
-      btns={[
-        {
-          body: "Make Start State",
-          onClick: () => this.setState({ startState: this.state.clickedState })
-        }
-      ]} />);
-
-    var toolbar = this.state.status === PageStatus.stateSelected ? state_toolbar : main_toolbar;
+  render() {
+    var toolbar = ((s) => {
+      if (s === PageStatus.stateSelected) {
+        return this.getStateToolbar();
+      } else {
+        return this.getMainToolbar();
+      }
+  })(this.state.status);
 
     return (
       <div>
@@ -155,7 +184,6 @@ class EditPage extends React.Component {
           <MachineCanvas
             machine={this.state.machine}
             clickedState={this.state.clickedState}
-            startState={this.state.startState}
             onClick={this.handleCanvasClick} //handle canvas click (for add state)
             onStateClick={this.handleStateClick} //handles state click (for highlighting)
             onStateDrag={this.handleStateDrag} //handles state drag (to move state)
