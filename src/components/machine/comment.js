@@ -8,14 +8,14 @@ class Comment extends React.Component {
   componentDidMount() {
 
     this.setState({dragBound : pos => {
-      const height = ReactDOM.findDOMNode(this).children[0].getHeight()
+      const height = ReactDOM.findDOMNode(this).children[0].getHeight();
       const w = this.props.size.width;
       const h = this.props.size.height;
       const x = pos.x < 5 ? 5 : pos.x > w-this.width+5 ? w-this.width+5 : pos.x ;
       const y = pos.y < 5 ? 5 : pos.y > h-this.state.height-5 ? h-this.state.height-5 : pos.y ;
       return {x : x, y : y};
     },
-    width : this.textNode.getTextWidth() + 20,
+    width : this.textNode.getTextWidth()+20,
     height : this.textNode.getHeight(),
     });
   }
@@ -26,7 +26,7 @@ class Comment extends React.Component {
         text = {this.props.comment.com}
         fontSize = {18}
         padding = {5}
-        align = {'center'}
+        align = {'left'}
         width={this.width}
         ref={node => {
           this.textNode = node;
