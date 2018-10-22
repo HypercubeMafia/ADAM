@@ -25,7 +25,7 @@ class ADAMToolbar extends React.Component {
                 {this.props.title}
               </Typography>
               {this.props.btns ? this.props.btns.map(x => (
-                <Button color="inherit" onClick = {x.onClick}>
+                <Button key={x.body} color="inherit" onClick = {x.onClick}>
                   {x.body}
                 </Button>
               )) : null}

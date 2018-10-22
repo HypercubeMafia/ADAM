@@ -196,7 +196,7 @@ class CardGrid extends React.Component {
     return (
       <Grid container spacing={16} style={{margin:16}}>
         {this.props.machines.map(x => (
-          <Grid item>
+          <Grid item key={x.title}>
             <MachineCard title={x.title} type={x.type} todfa={this.props.todfa}
              addMachine={this.props.addMachine} machines={this.props.machines}/>
           </Grid>

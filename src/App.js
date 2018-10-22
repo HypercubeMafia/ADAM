@@ -35,15 +35,14 @@ class App extends React.Component {
   };
 
   render() {
-    console.log(this.state.currentPage)
     if (this.state.currentPage === "machine-select") {
       return <MachineSelectPage todfa={this.toDFAHome} />;
     }
     else if (this.state.currentPage === "machine-edit"){
       return <EditPage  back={() => {this.toDFAHome(this.state.currentMachine)}}/>
-    } 
+    }
     else {
-      return <DFAHomePage back={this.toMachineSelect} title={this.state.currentMachine} 
+      return <DFAHomePage back={this.toMachineSelect} title={this.state.currentMachine}
 	edit={() => {this.toEdit(this.state.currentMachine)}}/>;
     }
   }
