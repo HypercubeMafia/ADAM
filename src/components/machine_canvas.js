@@ -38,14 +38,15 @@ class MachineCanvas extends React.Component {
               onDragEnd={(e) => this.props.onStateDrag(e,i)} //function to call on state drag end
             />
           ))}
-	  {this.props.machine.comments.map( (s,i) => (
+	        {this.props.machine.comments.map( (s,i) => (
             <Comment
               comment={s} //object holding state attributes (currently just location)
               size={this.state} //size of canvas, used to bound state's drag area
+              clicked={i === this.props.clickedComment} //whether this is clicked state
+              onClick={() => this.props.onCommentClick(i)} //function to call on comment click
               onDragEnd={(e) => this.props.onCommentDrag(e,i)} //function to call on state drag end
-	    />
-          ))
-	}
+             />
+          ))}
       </Stage>
     )
   }
