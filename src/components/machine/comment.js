@@ -3,25 +3,29 @@ import { Layer, Text, Group, Rect } from 'react-konva';
 import ReactDOM from 'react-dom';
 
 class Comment extends React.Component {
-  state={ dragBound : pos => {return{x:pos.x,y:pos.y}}, height : 0 }
+  state={ dragBound : pos => {return{x:pos.x,y:pos.y}}, height : 0 , width : 0}
   comment_width = 250;
-  componentDidMount() {
 
-    this.setState({dragBound : pos => {
-      const height = ReactDOM.findDOMNode(this).children[0].getHeight();
-      const w = this.props.size.width;
-      const h = this.props.size.height;
-      const x = pos.x < 5 ? 5 : pos.x > w-this.state.width+5 ? w-this.state.width+5 : pos.x ;
-      const y = pos.y < 5 ? 5 : pos.y > h-this.state.height-5 ? h-this.state.height-5 : pos.y ;
-      return {x : x, y : y};
-    },
-    width : this.textNode.getTextWidth()+20,
-    height : this.textNode.getHeight(),
+  componentDidMount() {
+    this.componentWillRecieveProps()
+  }
+
+  componentWillRecieveProps() {
+    this.setState({
+      width : ReactDOM.findDOMNode(this).children[0].getWidth(),
+      height : ReactDOM.findDOMNode(this).children[0].getHeight(),
+      dragBound : pos => {
+        //const height = ReactDOM.findDOMNode(this).children[0].getHeight();
+        const w = this.props.size.width;
+        const h = this.props.size.height;
+        const x = pos.x < 5 ? 5 : pos.x > w-this.state.width+5 ? w-this.state.width+5 : pos.x ;
+        const y = pos.y < 5 ? 5 : pos.y > h-this.state.height-5 ? h-this.state.height-5 : pos.y ;
+        return {x : x, y : y};
+      }
     });
   }
 
   render() {
-
     var commentText = (<Text
         text = {this.props.comment.com}
         fontSize = {18}

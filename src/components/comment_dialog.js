@@ -23,6 +23,7 @@ class CommentDialog extends React.Component {
       margin="dense"
       label="Comment"
       type="string"
+      defaultValue={this.props.def}
       onChange={e => this.setState(
         { commentText: e.target.value, hintText: this.buildHintText(e.target.value) }
       )}
@@ -34,11 +35,12 @@ class CommentDialog extends React.Component {
       }}
       fullWidth
     />
+
   );
 
   buildHintText = commentText => {
     if (commentText === "") {
-      return "Please enter a comment."; 
+      return "Please enter a comment.";
     } else {
       return "";
     }

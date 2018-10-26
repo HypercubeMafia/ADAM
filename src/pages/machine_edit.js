@@ -30,6 +30,7 @@ class EditPage extends React.Component {
     nameStateOpen : false,
 
     isComment : false,
+    isCommentEdit : false,
     clickState : null
   };
 
@@ -69,7 +70,7 @@ class EditPage extends React.Component {
 
     }
     else if (this.state.status === PageStatus.addComment) {
- 	this.setState({isComment:true, clickState:e});
+ 	    this.setState({isComment:true, clickState:e});
      }
 
   }
@@ -164,8 +165,22 @@ class EditPage extends React.Component {
       });
   }
 
+  editComment = (text) => {
+    this.setState({
+        machine:
+          update(this.state.machine, {comments: {[this.state.clickedComment]: { com: {
+            $set: text
+          }}}}),
+        status: PageStatus.default //return to default page status
+      });
+  }
+
   handleOptionsClose = () => {
         this.setState({isComment: false,status:PageStatus.default});
+  }
+
+  handleOptionsCloseEdit = () => {
+        this.setState({isCommentEdit: false,status:PageStatus.default});
   }
 
   getStateToolbar = () => {
@@ -214,7 +229,9 @@ class EditPage extends React.Component {
         },
         {
           body: "Edit",
-          onClick: () => console.log("NO!")
+          onClick: () => this.setState({
+            isCommentEdit : true
+          })
         }
       ]}
     />);
@@ -258,7 +275,9 @@ class EditPage extends React.Component {
           </Typography>
         </Paper>
     	  <CommentDialog isOpen={this.state.isComment} onClose={this.handleOptionsClose}
-                 	 type={this.props.type} update={this.makeComment}/>
+                 	 type={this.props.type} update={this.makeComment} def={this.state.clickedState === -1 ? "" : this.state.machine.comments[this.comment.clickedComment].com}/>
+        <CommentDialog isOpen={this.state.isCommentEdit} onClose={this.handleOptionsCloseEdit}
+                	 type={this.props.type} update={this.editComment} def={this.state.clickedState === -1 ? "" : this.state.machine.comments[this.comment.clickedComment].com}/>
         <Paper elevation={1} style={{margin:32, padding:0}}>
           <MachineCanvas
             machine={this.state.machine}
