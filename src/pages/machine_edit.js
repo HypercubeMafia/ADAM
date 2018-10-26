@@ -211,6 +211,10 @@ class EditPage extends React.Component {
             clickedComment: -1,
             status: PageStatus.default
           })
+        },
+        {
+          body: "Edit",
+          onClick: () => console.log("NO!")
         }
       ]}
     />);
