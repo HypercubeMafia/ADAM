@@ -13,7 +13,8 @@ const PageStatus = {
   default : 1,
   addState : 2,
   stateSelected : 3,
-  addComment : 4
+  addComment : 4,
+  commentSelected : 5
 }
 
 class EditPage extends React.Component {
@@ -23,13 +24,13 @@ class EditPage extends React.Component {
       states : [],
       startState : -1, //-1 for no state
       comments : []
-    }, 
+    },
     clickedState : -1, //state which is currently clicked, -1 for no state
+    clickedComment : -1, //comment which is currently clicked, -1 for no comment
+    nameStateOpen : false,
 
-    nameStateOpen: false,
-
-    isComment:false,
-    clickState:null
+    isComment : false,
+    clickState : null
   };
 
   getModeText = () => {
@@ -48,7 +49,7 @@ class EditPage extends React.Component {
       body: "Add State",
       onClick: () => this.setState({ status: PageStatus.addState })
     },
-    { 
+    {
       body: "Add Comment",
       onClick: () => this.setState({ status: PageStatus.addComment })
     }
@@ -56,8 +57,6 @@ class EditPage extends React.Component {
   ];
 
   handleCanvasClick = e => {
-    console.log(this.state.machine)
-    console.log(this.state.PageStatus)
     if (this.state.status === PageStatus.addState) {
       this.setState({
         machine:
@@ -67,7 +66,7 @@ class EditPage extends React.Component {
           }}),
         status: PageStatus.default //return to default page status
       });
-     
+
     }
     else if (this.state.status === PageStatus.addComment) {
  	this.setState({isComment:true, clickState:e});
@@ -140,6 +139,21 @@ class EditPage extends React.Component {
     });
   }
 
+  handleCommentClick = i => {
+    console.log("COMMENT CLICKED!!!")
+    if (this.state.clickedComment === i) { //this state is currently selected, so we unselect it
+      this.setState({
+        status: PageStatus.default, //return to default page status
+        clickedComment: -1 //no state is currently clicked
+      });
+    } else { //this state is currently unselected
+      this.setState({
+        status: PageStatus.commentSelected, //now in state selected page status
+        clickedComment: i //indicate that this state has been clicked
+      });
+    }
+  }
+
   makeComment = (text) => {
     this.setState({
         machine:
@@ -152,7 +166,7 @@ class EditPage extends React.Component {
 
   handleOptionsClose = () => {
         this.setState({isComment: false,status:PageStatus.default});
-  };
+  }
 
   getStateToolbar = () => {
     return (<ADAMToolbar title="MODIFY STATE"
@@ -184,6 +198,24 @@ class EditPage extends React.Component {
     />);
   }
 
+  getCommentToolbar = () => {
+    return (<ADAMToolbar title="MODIFY COMMENT"
+      back={() => this.setState({ status: PageStatus.default, clickedComment: -1 }) }
+      btns={[
+        {
+          body: "Delete",
+          onClick: () => this.setState({
+            machine: update(this.state.machine, {comments: {
+              $splice: [[this.state.clickedComment, 1]]
+            }}),
+            clickedComment: -1,
+            status: PageStatus.default
+          })
+        }
+      ]}
+    />);
+  }
+
   getMainToolbar = () => {
     return (<ADAMToolbar
       title="EDIT"
@@ -197,15 +229,16 @@ class EditPage extends React.Component {
           body: "Add Comment",
           onClick: () => this.setState({ status: PageStatus.addComment })
         }
-      ]} 
+      ]}
     />);
-      
   }
 
   render() {
     var toolbar = ((s) => {
       if (s === PageStatus.stateSelected) {
         return this.getStateToolbar();
+      } else if (s === PageStatus.commentSelected) {
+        return this.getCommentToolbar();
       } else {
         return this.getMainToolbar();
       }
@@ -220,18 +253,20 @@ class EditPage extends React.Component {
             {this.getModeText()}
           </Typography>
         </Paper>
-	<CommentDialog isOpen={this.state.isComment} onClose={this.handleOptionsClose}
+    	  <CommentDialog isOpen={this.state.isComment} onClose={this.handleOptionsClose}
                  	 type={this.props.type} update={this.makeComment}/>
         <Paper elevation={1} style={{margin:32, padding:0}}>
           <MachineCanvas
             machine={this.state.machine}
-            clickedState={this.state.clickedState}
             onClick={this.handleCanvasClick} //handle canvas click (for add state)
+            clickedState={this.state.clickedState}
             onStateClick={this.handleStateClick} //handles state click (for highlighting)
             onStateDrag={this.handleStateDrag} //handles state drag (to move state)
-	    onCommentDrag={this.handleCommentDrag} //handles comment drag to move comment 
+            clickedComment={this.state.clickedComment}
+            onCommentDrag={this.handleCommentDrag} //handles comment drag to move comment
+            onCommentClick={this.handleCommentClick} //handles comment click (for highlighting)
             text={CommentDialog.commentText}
-	  />
+	        />
         </Paper>
 
       <NameStateDialog
