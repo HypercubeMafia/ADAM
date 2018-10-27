@@ -170,8 +170,7 @@ class EditPage extends React.Component {
         machine:
           update(this.state.machine, {comments: {[this.state.clickedComment]: { com: {
             $set: text
-          }}}}),
-        status: PageStatus.default //return to default page status
+          }}}})
       });
   }
 
@@ -180,7 +179,7 @@ class EditPage extends React.Component {
   }
 
   handleOptionsCloseEdit = () => {
-        this.setState({isCommentEdit: false,status:PageStatus.default});
+        this.setState({isCommentEdit: false});
   }
 
   getStateToolbar = () => {
@@ -275,9 +274,9 @@ class EditPage extends React.Component {
           </Typography>
         </Paper>
     	  <CommentDialog isOpen={this.state.isComment} onClose={this.handleOptionsClose}
-                 	 type={this.props.type} update={this.makeComment} def={this.state.clickedState === -1 ? "" : this.state.machine.comments[this.comment.clickedComment].com}/>
+                 	 type={this.props.type} update={this.makeComment} def={this.state.clickedComment === -1 ? "" : this.state.machine.comments[this.state.clickedComment].com}/>
         <CommentDialog isOpen={this.state.isCommentEdit} onClose={this.handleOptionsCloseEdit}
-                	 type={this.props.type} update={this.editComment} def={this.state.clickedState === -1 ? "" : this.state.machine.comments[this.comment.clickedComment].com}/>
+                	 type={this.props.type} update={this.editComment} def={this.state.clickedComment === -1 ? "" : this.state.machine.comments[this.state.clickedComment].com}/>
         <Paper elevation={1} style={{margin:32, padding:0}}>
           <MachineCanvas
             machine={this.state.machine}
