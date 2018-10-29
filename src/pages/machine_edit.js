@@ -30,6 +30,7 @@ class EditPage extends React.Component {
     nameStateOpen : false,
 
     isComment : false,
+    isCommentEdit : false,
     clickState : null
   };
 
@@ -69,7 +70,7 @@ class EditPage extends React.Component {
 
     }
     else if (this.state.status === PageStatus.addComment) {
- 	this.setState({isComment:true, clickState:e});
+ 	    this.setState({isComment:true, clickState:e});
      }
 
   }
@@ -164,8 +165,21 @@ class EditPage extends React.Component {
       });
   }
 
+  editComment = (text) => {
+    this.setState({
+        machine:
+          update(this.state.machine, {comments: {[this.state.clickedComment]: { com: {
+            $set: text
+          }}}})
+      });
+  }
+
   handleOptionsClose = () => {
         this.setState({isComment: false,status:PageStatus.default});
+  }
+
+  handleOptionsCloseEdit = () => {
+        this.setState({isCommentEdit: false});
   }
 
   getStateToolbar = () => {
@@ -211,6 +225,12 @@ class EditPage extends React.Component {
             clickedComment: -1,
             status: PageStatus.default
           })
+        },
+        {
+          body: "Edit",
+          onClick: () => this.setState({
+            isCommentEdit : true
+          })
         }
       ]}
     />);
@@ -254,7 +274,9 @@ class EditPage extends React.Component {
           </Typography>
         </Paper>
     	  <CommentDialog isOpen={this.state.isComment} onClose={this.handleOptionsClose}
-                 	 type={this.props.type} update={this.makeComment}/>
+                 	 type={this.props.type} update={this.makeComment} def={this.state.clickedComment === -1 ? "" : this.state.machine.comments[this.state.clickedComment].com}/>
+        <CommentDialog isOpen={this.state.isCommentEdit} onClose={this.handleOptionsCloseEdit}
+                	 type={this.props.type} update={this.editComment} def={this.state.clickedComment === -1 ? "" : this.state.machine.comments[this.state.clickedComment].com}/>
         <Paper elevation={1} style={{margin:32, padding:0}}>
           <MachineCanvas
             machine={this.state.machine}
