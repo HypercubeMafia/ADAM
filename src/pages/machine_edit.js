@@ -14,7 +14,8 @@ const PageStatus = {
   addState : 2,
   stateSelected : 3,
   addComment : 4,
-  commentSelected : 5
+  commentSelected : 5,
+  addTransition : 6
 }
 
 class EditPage extends React.Component {
@@ -39,7 +40,9 @@ class EditPage extends React.Component {
       case PageStatus.addState:
         return "Click on the canvas to draw a state.";
       case PageStatus.addComment:
-	return "Click on the canvas to add a comment.";
+        return "Click on the canvas to add a comment.";
+      case PageStatus.addTransition:
+        return "Click on the canvas to add a transition.";
       default:
         return '\u200b';
     }
@@ -248,6 +251,10 @@ class EditPage extends React.Component {
         {
           body: "Add Comment",
           onClick: () => this.setState({ status: PageStatus.addComment })
+        },
+        {
+          body: "Add Transition",
+          onClick: () => this.setState({ status: PageStatus.addTransition })
         }
       ]}
     />);
