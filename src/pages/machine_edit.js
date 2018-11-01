@@ -25,15 +25,19 @@ class EditPage extends React.Component {
     machine : { // machine description
       states : [],
       startState : -1, //-1 for no state
-      comments : []
+      comments : [],
+      transitions : []
     },
     clickedState : -1, //state which is currently clicked, -1 for no state
-    clickedComment : -1, //comment which is currently clicked, -1 for no comment
     nameStateOpen : false,
 
+    clickedComment : -1, //comment which is currently clicked, -1 for no comment
     isComment : false,
     isCommentEdit : false,
-    clickState : null
+    clickState : null,
+
+    // transition in progress; state is a reference, location is "N", "E", "S", "W"
+    newTransitionSrc : {state: null, loc: ""}
   };
 
   getModeText = () => {
@@ -82,6 +86,12 @@ class EditPage extends React.Component {
   }
 
   handleStateClick = i => {
+    // disable state clicking when we are trying to add a transition
+    if (this.state.status === PageStatus.addTransitionSrc ||
+        this.state.status === PageStatus.addTransitionDest) {
+            return;
+    }
+
     if (this.state.clickedState === i) { //this state is currently selected, so we unselect it
       this.setState({
         status: PageStatus.default, //return to default page status
@@ -186,6 +196,28 @@ class EditPage extends React.Component {
 
   handleOptionsCloseEdit = () => {
         this.setState({isCommentEdit: false});
+  }
+
+  handleAttachmentPointClick = (s, loc) => {
+    if (this.state.status === PageStatus.addTransitionSrc) {
+      this.setState({
+        status : PageStatus.addTransitionDest,
+        newTransitionSrc : { state: s, loc: loc }
+      });
+    } else if (this.state.status === PageStatus.addTransitionDest) {
+      this.setState({
+        status : PageStatus.default,
+        machine : update(this.state.machine, { transitions: {
+          $push: [{
+                    srcState : this.state.newTransitionSrc.state,
+                    srcLoc : this.state.newTransitionSrc.loc,
+                    destState : s,
+                    destLoc : loc
+                 }]
+        }}),
+        newTransitionSrc: {state: null, loc: ""}
+      })
+    }
   }
 
   getStateToolbar = () => {
