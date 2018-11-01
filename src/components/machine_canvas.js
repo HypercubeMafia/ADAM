@@ -36,6 +36,7 @@ class MachineCanvas extends React.Component {
               start={i === this.props.machine.startState} //whether this is start state
               onClick={() => this.props.onStateClick(i)} //function to call on state click
               onDragEnd={(e) => this.props.onStateDrag(e,i)} //function to call on state drag end
+              addingTransition={this.props.addingTransition}
             />
           ))}
 	        {this.props.machine.comments.map( (s,i) => (

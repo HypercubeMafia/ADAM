@@ -15,7 +15,8 @@ const PageStatus = {
   stateSelected : 3,
   addComment : 4,
   commentSelected : 5,
-  addTransition : 6
+  addTransitionSrc : 6,
+  addTransitionDest : 7
 }
 
 class EditPage extends React.Component {
@@ -41,8 +42,10 @@ class EditPage extends React.Component {
         return "Click on the canvas to draw a state.";
       case PageStatus.addComment:
         return "Click on the canvas to add a comment.";
-      case PageStatus.addTransition:
-        return "Click on the canvas to add a transition.";
+      case PageStatus.addTransitionSrc:
+        return "Click on a purple attachment point to choose a source state.";
+      case PageStatus.addTransitionDest:
+        return "Click on a purple attachment point to choose a destination state.";
       default:
         return '\u200b';
     }
@@ -254,7 +257,7 @@ class EditPage extends React.Component {
         },
         {
           body: "Add Transition",
-          onClick: () => this.setState({ status: PageStatus.addTransition })
+          onClick: () => this.setState({ status: PageStatus.addTransitionSrc })
         }
       ]}
     />);
@@ -294,6 +297,7 @@ class EditPage extends React.Component {
             clickedComment={this.state.clickedComment}
             onCommentDrag={this.handleCommentDrag} //handles comment drag to move comment
             onCommentClick={this.handleCommentClick} //handles comment click (for highlighting)
+            addingTransition={this.state.status === PageStatus.addTransitionSrc || this.state.status === PageStatus.addTransitionDest}
             text={CommentDialog.commentText}
 	        />
         </Paper>

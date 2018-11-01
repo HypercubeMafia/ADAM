@@ -3,6 +3,7 @@ import { Layer, Circle, Arrow, Text, Group } from 'react-konva';
 
 class State extends React.Component {
   radius = 40;
+  attach_radius = 5;
   accept_pad = 5;
 
   dragBound = pos => { //function which ensures state is not dragged off of canvas
@@ -70,6 +71,42 @@ class State extends React.Component {
         text={this.props.state.name}
     />);
 
+    var attachNorth = this.props.addingTransition ?
+      (<Circle
+          x={this.props.state.x}
+          y={this.props.state.y - this.radius}
+          radius={this.attach_radius}
+          fill={"purple"}
+      />)
+    : null;
+
+    var attachEast = this.props.addingTransition ?
+      (<Circle
+          x={this.props.state.x + this.radius}
+          y={this.props.state.y}
+          radius={this.attach_radius}
+          fill={"purple"}
+      />)
+    : null;
+
+    var attachSouth = this.props.addingTransition ?
+      (<Circle
+          x={this.props.state.x}
+          y={this.props.state.y + this.radius}
+          radius={this.attach_radius}
+          fill={"purple"}
+      />)
+    : null;
+
+    var attachWest = this.props.addingTransition ?
+      (<Circle
+          x={this.props.state.x - this.radius}
+          y={this.props.state.y}
+          radius={this.attach_radius}
+          fill={"purple"}
+      />)
+    : null;
+
     return (
       <Layer>
         <Group
@@ -83,6 +120,10 @@ class State extends React.Component {
           {startLabel}
           {startArrow}
           {stateLabel}
+          {attachNorth}
+          {attachEast}
+          {attachSouth}
+          {attachWest}
         </Group>
       </Layer>
     )
