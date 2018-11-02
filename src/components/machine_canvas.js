@@ -4,6 +4,8 @@ import { Stage } from 'react-konva';
 
 import State from './machine/state';
 import Comment from './machine/comment';
+import Transition from './machine/transition';
+
 class MachineCanvas extends React.Component {
   state = { //default values used until component loads
     width: 1000,
@@ -26,6 +28,8 @@ class MachineCanvas extends React.Component {
   }
 
   render() {
+    console.log(this.props.machine.transitions);
+
     return (
       <Stage width={this.state.width} height={this.state.height} onClick={this.props.onClick}>
           {this.props.machine.states.map( (s,i) => (
@@ -36,6 +40,7 @@ class MachineCanvas extends React.Component {
               start={i === this.props.machine.startState} //whether this is start state
               onClick={() => this.props.onStateClick(i)} //function to call on state click
               onDragEnd={(e) => this.props.onStateDrag(e,i)} //function to call on state drag end
+              onAttachPointClick={(loc)=>this.props.onAttachPointClick(i,loc)}
               addingTransition={this.props.addingTransition}
             />
           ))}
@@ -48,6 +53,13 @@ class MachineCanvas extends React.Component {
               onDragEnd={(e) => this.props.onCommentDrag(e,i)} //function to call on state drag end
              />
           ))}
+          {this.props.machine.transitions.map( (s) => (
+            <Transition
+              src={{ state: this.props.machine.states[s.srcState], loc: s.srcLoc}}
+              dest={{ state: this.props.machine.states[s.destState], loc: s.destLoc}}
+            />
+          ))}
+
       </Stage>
     )
   }

@@ -218,6 +218,7 @@ class EditPage extends React.Component {
         newTransitionSrc: {state: null, loc: ""}
       })
     }
+    console.log(this.state.machine.transitions);
   }
 
   getStateToolbar = () => {
@@ -329,6 +330,7 @@ class EditPage extends React.Component {
             clickedComment={this.state.clickedComment}
             onCommentDrag={this.handleCommentDrag} //handles comment drag to move comment
             onCommentClick={this.handleCommentClick} //handles comment click (for highlighting)
+            onAttachPointClick={this.handleAttachmentPointClick}
             addingTransition={this.state.status === PageStatus.addTransitionSrc || this.state.status === PageStatus.addTransitionDest}
             text={CommentDialog.commentText}
 	        />

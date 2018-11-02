@@ -77,6 +77,7 @@ class State extends React.Component {
           y={this.props.state.y - this.radius}
           radius={this.attach_radius}
           fill={"purple"}
+          onClick={()=>this.props.onAttachPointClick("N")}
       />)
     : null;
 
@@ -86,6 +87,7 @@ class State extends React.Component {
           y={this.props.state.y}
           radius={this.attach_radius}
           fill={"purple"}
+          onClick={()=>this.props.onAttachPointClick("E")}
       />)
     : null;
 
@@ -95,6 +97,7 @@ class State extends React.Component {
           y={this.props.state.y + this.radius}
           radius={this.attach_radius}
           fill={"purple"}
+          onClick={()=>this.props.onAttachPointClick("S")}
       />)
     : null;
 
@@ -104,6 +107,7 @@ class State extends React.Component {
           y={this.props.state.y}
           radius={this.attach_radius}
           fill={"purple"}
+          onClick={()=>this.props.onAttachPointClick("W")}
       />)
     : null;
 
