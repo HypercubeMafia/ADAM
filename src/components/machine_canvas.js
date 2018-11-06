@@ -28,13 +28,12 @@ class MachineCanvas extends React.Component {
   }
 
   render() {
-    console.log(this.props.machine.transitions);
-
     return (
       <Stage width={this.state.width} height={this.state.height} onClick={this.props.onClick}>
           {this.props.machine.states.map( (s,i) => (
             <State
-              state={s} //object holding state attributes (currently just location)
+              key={s.key}
+              state={s} //object holding state attributes
               size={this.state} //size of canvas, used to bound state's drag area
               clicked={i === this.props.clickedState} //whether this is clicked state
               start={i === this.props.machine.startState} //whether this is start state

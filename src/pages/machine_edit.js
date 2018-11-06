@@ -37,7 +37,11 @@ class EditPage extends React.Component {
     clickState : null,
 
     // transition in progress; state is a reference, location is "N", "E", "S", "W"
-    newTransitionSrc : {state: null, loc: ""}
+    newTransitionSrc : {state: null, loc: ""},
+
+    // these variables are used to give a unique identifier to the canvas components
+    // they should be updated whenever the component is created or moved
+    nextStateKey : 0
   };
 
   getModeText = () => {
@@ -72,10 +76,11 @@ class EditPage extends React.Component {
       this.setState({
         machine:
           update(this.state.machine, {states: {
-            $push: [{x:e.evt.offsetX, y:e.evt.offsetY, accepting:false, name:""}]
+            $push: [{key:"s"+this.state.nextStateKey, x:e.evt.offsetX, y:e.evt.offsetY, accepting:false, name:""}]
             // add a state centered at the click location to states array
           }}),
-        status: PageStatus.default //return to default page status
+        status: PageStatus.default, //return to default page status
+        nextStateKey: this.state.nextStateKey + 1
       });
 
     }
@@ -106,11 +111,19 @@ class EditPage extends React.Component {
   }
 
   handleStateDrag = (e,i) => {
+    let dx = e.target.attrs.x;
+    let dy = e.target.attrs.y;
+
+    let newx = this.state.machine.states[i].x + dx;
+    let newy = this.state.machine.states[i].y + dy;
+
     this.setState({
       machine: update(this.state.machine, {states: {[i]: {
-      $merge: {x: e.target.children[0].x(), y: e.target.children[0].y()}
-        //set the location of the state to be the end location of the drag
-      }}})
+      $merge: {
+        key:"s"+this.state.nextStateKey, //update the state key
+        x: newx, y: newy} //set the location of the state to be the end location of the drag
+      }}}),
+      nextStateKey: this.state.nextStateKey + 1
     });
   }
 
@@ -157,7 +170,6 @@ class EditPage extends React.Component {
   }
 
   handleCommentClick = i => {
-    console.log("COMMENT CLICKED!!!")
     if (this.state.clickedComment === i) { //this state is currently selected, so we unselect it
       this.setState({
         status: PageStatus.default, //return to default page status
@@ -218,7 +230,6 @@ class EditPage extends React.Component {
         newTransitionSrc: {state: null, loc: ""}
       })
     }
-    console.log(this.state.machine.transitions);
   }
 
   getStateToolbar = () => {
