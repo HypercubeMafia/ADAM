@@ -71,7 +71,7 @@ class State extends React.Component {
         text={this.props.state.name}
     />);
 
-    var attachNorth = this.props.addingTransition ?
+    var attachNorth = ["A", "N"].includes(this.props.attachmentPoints) ?
       (<Circle
           x={this.props.state.x}
           y={this.props.state.y - this.radius}
@@ -81,7 +81,7 @@ class State extends React.Component {
       />)
     : null;
 
-    var attachEast = this.props.addingTransition ?
+    var attachEast = ["A", "E"].includes(this.props.attachmentPoints) ?
       (<Circle
           x={this.props.state.x + this.radius}
           y={this.props.state.y}
@@ -91,7 +91,7 @@ class State extends React.Component {
       />)
     : null;
 
-    var attachSouth = this.props.addingTransition ?
+    var attachSouth = ["A", "S"].includes(this.props.attachmentPoints) ?
       (<Circle
           x={this.props.state.x}
           y={this.props.state.y + this.radius}
@@ -101,7 +101,7 @@ class State extends React.Component {
       />)
     : null;
 
-    var attachWest = this.props.addingTransition ?
+    var attachWest = ["A", "W"].includes(this.props.attachmentPoints) ?
       (<Circle
           x={this.props.state.x - this.radius}
           y={this.props.state.y}

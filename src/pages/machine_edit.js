@@ -343,6 +343,7 @@ class EditPage extends React.Component {
             onCommentClick={this.handleCommentClick} //handles comment click (for highlighting)
             onAttachPointClick={this.handleAttachmentPointClick}
             addingTransition={this.state.status === PageStatus.addTransitionSrc || this.state.status === PageStatus.addTransitionDest}
+            transitionSrc={this.state.newTransitionSrc}
             text={CommentDialog.commentText}
 	        />
         </Paper>

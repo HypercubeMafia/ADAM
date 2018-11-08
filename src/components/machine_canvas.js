@@ -30,7 +30,17 @@ class MachineCanvas extends React.Component {
   render() {
     return (
       <Stage width={this.state.width} height={this.state.height} onClick={this.props.onClick}>
-          {this.props.machine.states.map( (s,i) => (
+          {this.props.machine.states.map( (s,i) => {
+            let attachmentPoints = "";
+            if (this.props.addingTransition) {
+              if (i === this.props.transitionSrc.state) {
+                  attachmentPoints = this.props.transitionSrc.loc;
+              } else {
+                  attachmentPoints = "A";
+              }
+            }
+
+            return (
             <State
               key={s.key}
               state={s} //object holding state attributes
@@ -40,9 +50,9 @@ class MachineCanvas extends React.Component {
               onClick={() => this.props.onStateClick(i)} //function to call on state click
               onDragEnd={(e) => this.props.onStateDrag(e,i)} //function to call on state drag end
               onAttachPointClick={(loc)=>this.props.onAttachPointClick(i,loc)}
-              addingTransition={this.props.addingTransition}
+              attachmentPoints={attachmentPoints}
             />
-          ))}
+          )})}
 	        {this.props.machine.comments.map( (s,i) => (
             <Comment
               comment={s} //object holding state attributes (currently just location)
