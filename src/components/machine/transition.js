@@ -5,7 +5,6 @@ class Transition extends React.Component {
 
     render() {
         let radius = 40; // MUST match radius in state.js!!!!!
-
         let xOffset = c => {
             switch(c) {
                 case "N":
@@ -42,18 +41,30 @@ class Transition extends React.Component {
         let x2 = dest.state.x + xOffset(dest.loc)
         let y2 = dest.state.y + yOffset(dest.loc)
 
+        let points = [];
+
+        if (src.state === dest.state) {
+          let tri_len = 2.2; // Relative to radius
+
+          let xc1 = src.state.x + tri_len * (xOffset(src.loc) - 0.6 * yOffset(src.loc));
+          let yc1 = src.state.y + tri_len * (yOffset(src.loc) - 0.6 * xOffset(src.loc));
+          let xc2 = src.state.x + tri_len * (xOffset(src.loc) + 0.6 * yOffset(src.loc));
+          let yc2 = src.state.y + tri_len * (yOffset(src.loc) + 0.6 * xOffset(src.loc));
+          points = [x1,y1, xc1,yc1, xc2,yc2, x2,y2];
+        } else {
+          let xc = Math.floor((x1+x2)/2);
+          let yc = Math.floor((y1+y2)/2);
+          points = [x1,y1,xc,yc,x2,y2];
+        }
+
         return (
             <Layer>
             <Arrow
-            points = {[
-                x1,
-                y1,
-                x2,
-                y2
-            ]}
+            points = {points}
             fill={"black"}
             stroke={"black"}
             strokeWidth={1}
+            bezier={src.state === dest.state}
             />
             </Layer>
         );
