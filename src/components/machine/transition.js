@@ -44,7 +44,7 @@ class Transition extends React.Component {
         let points = [];
 
         if (src.state === dest.state) {
-          let tri_len = 2.2; // Relative to radius
+          let tri_len = 3.0; // Relative to radius
 
           let xc1 = src.state.x + tri_len * (xOffset(src.loc) - 0.6 * yOffset(src.loc));
           let yc1 = src.state.y + tri_len * (yOffset(src.loc) - 0.6 * xOffset(src.loc));
@@ -52,9 +52,9 @@ class Transition extends React.Component {
           let yc2 = src.state.y + tri_len * (yOffset(src.loc) + 0.6 * xOffset(src.loc));
           points = [x1,y1, xc1,yc1, xc2,yc2, x2,y2];
         } else {
-          let xc = Math.floor((x1+x2)/2);
-          let yc = Math.floor((y1+y2)/2);
-          points = [x1,y1,xc,yc,x2,y2];
+          let xc = Math.floor((x1+x2)/2 + (y2-y1) * 0.2);
+          let yc = Math.floor((y1+y2)/2 + (x1-x2) * 0.2);
+          points = [x1,y1,xc,yc,xc,yc,x2,y2];
         }
 
         return (
@@ -64,7 +64,7 @@ class Transition extends React.Component {
             fill={"black"}
             stroke={"black"}
             strokeWidth={1}
-            bezier={src.state === dest.state}
+            bezier={true}
             />
             </Layer>
         );
