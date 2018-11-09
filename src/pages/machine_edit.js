@@ -14,7 +14,9 @@ const PageStatus = {
   addState : 2,
   stateSelected : 3,
   addComment : 4,
-  commentSelected : 5
+  commentSelected : 5,
+  addTransitionSrc : 6,
+  addTransitionDest : 7
 }
 
 class EditPage extends React.Component {
@@ -23,15 +25,23 @@ class EditPage extends React.Component {
     machine : { // machine description
       states : [],
       startState : -1, //-1 for no state
-      comments : []
+      comments : [],
+      transitions : []
     },
     clickedState : -1, //state which is currently clicked, -1 for no state
-    clickedComment : -1, //comment which is currently clicked, -1 for no comment
     nameStateOpen : false,
 
+    clickedComment : -1, //comment which is currently clicked, -1 for no comment
     isComment : false,
     isCommentEdit : false,
-    clickState : null
+    clickState : null,
+
+    // transition in progress; state is a reference, location is "N", "E", "S", "W"
+    newTransitionSrc : {state: null, loc: ""},
+
+    // these variables are used to give a unique identifier to the canvas components
+    // they should be updated whenever the component is created or moved
+    nextStateKey : 0
   };
 
   getModeText = () => {
@@ -39,7 +49,11 @@ class EditPage extends React.Component {
       case PageStatus.addState:
         return "Click on the canvas to draw a state.";
       case PageStatus.addComment:
-	return "Click on the canvas to add a comment.";
+        return "Click on the canvas to add a comment.";
+      case PageStatus.addTransitionSrc:
+        return "Click on a purple attachment point to choose a source state.";
+      case PageStatus.addTransitionDest:
+        return "Click on a purple attachment point to choose a destination state.";
       default:
         return '\u200b';
     }
@@ -62,10 +76,11 @@ class EditPage extends React.Component {
       this.setState({
         machine:
           update(this.state.machine, {states: {
-            $push: [{x:e.evt.offsetX, y:e.evt.offsetY, accepting:false, name:""}]
+            $push: [{key:"s"+this.state.nextStateKey, x:e.evt.offsetX, y:e.evt.offsetY, accepting:false, name:""}]
             // add a state centered at the click location to states array
           }}),
-        status: PageStatus.default //return to default page status
+        status: PageStatus.default, //return to default page status
+        nextStateKey: this.state.nextStateKey + 1
       });
 
     }
@@ -76,6 +91,12 @@ class EditPage extends React.Component {
   }
 
   handleStateClick = i => {
+    // disable state clicking when we are trying to add a transition
+    if (this.state.status === PageStatus.addTransitionSrc ||
+        this.state.status === PageStatus.addTransitionDest) {
+            return;
+    }
+
     if (this.state.clickedState === i) { //this state is currently selected, so we unselect it
       this.setState({
         status: PageStatus.default, //return to default page status
@@ -90,11 +111,19 @@ class EditPage extends React.Component {
   }
 
   handleStateDrag = (e,i) => {
+    let dx = e.target.attrs.x;
+    let dy = e.target.attrs.y;
+
+    let newx = this.state.machine.states[i].x + dx;
+    let newy = this.state.machine.states[i].y + dy;
+
     this.setState({
       machine: update(this.state.machine, {states: {[i]: {
-      $merge: {x: e.target.children[0].x(), y: e.target.children[0].y()}
-        //set the location of the state to be the end location of the drag
-      }}})
+      $merge: {
+        key:"s"+this.state.nextStateKey, //update the state key
+        x: newx, y: newy} //set the location of the state to be the end location of the drag
+      }}}),
+      nextStateKey: this.state.nextStateKey + 1
     });
   }
 
@@ -141,7 +170,6 @@ class EditPage extends React.Component {
   }
 
   handleCommentClick = i => {
-    console.log("COMMENT CLICKED!!!")
     if (this.state.clickedComment === i) { //this state is currently selected, so we unselect it
       this.setState({
         status: PageStatus.default, //return to default page status
@@ -180,6 +208,28 @@ class EditPage extends React.Component {
 
   handleOptionsCloseEdit = () => {
         this.setState({isCommentEdit: false});
+  }
+
+  handleAttachmentPointClick = (s, loc) => {
+    if (this.state.status === PageStatus.addTransitionSrc) {
+      this.setState({
+        status : PageStatus.addTransitionDest,
+        newTransitionSrc : { state: s, loc: loc }
+      });
+    } else if (this.state.status === PageStatus.addTransitionDest) {
+      this.setState({
+        status : PageStatus.default,
+        machine : update(this.state.machine, { transitions: {
+          $push: [{
+                    srcState : this.state.newTransitionSrc.state,
+                    srcLoc : this.state.newTransitionSrc.loc,
+                    destState : s,
+                    destLoc : loc
+                 }]
+        }}),
+        newTransitionSrc: {state: null, loc: ""}
+      })
+    }
   }
 
   getStateToolbar = () => {
@@ -248,6 +298,10 @@ class EditPage extends React.Component {
         {
           body: "Add Comment",
           onClick: () => this.setState({ status: PageStatus.addComment })
+        },
+        {
+          body: "Add Transition",
+          onClick: () => this.setState({ status: PageStatus.addTransitionSrc })
         }
       ]}
     />);
@@ -287,6 +341,9 @@ class EditPage extends React.Component {
             clickedComment={this.state.clickedComment}
             onCommentDrag={this.handleCommentDrag} //handles comment drag to move comment
             onCommentClick={this.handleCommentClick} //handles comment click (for highlighting)
+            onAttachPointClick={this.handleAttachmentPointClick}
+            addingTransition={this.state.status === PageStatus.addTransitionSrc || this.state.status === PageStatus.addTransitionDest}
+            transitionSrc={this.state.newTransitionSrc}
             text={CommentDialog.commentText}
 	        />
         </Paper>

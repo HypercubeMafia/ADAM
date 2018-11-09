@@ -4,6 +4,8 @@ import { Stage } from 'react-konva';
 
 import State from './machine/state';
 import Comment from './machine/comment';
+import Transition from './machine/transition';
+
 class MachineCanvas extends React.Component {
   state = { //default values used until component loads
     width: 1000,
@@ -28,16 +30,29 @@ class MachineCanvas extends React.Component {
   render() {
     return (
       <Stage width={this.state.width} height={this.state.height} onClick={this.props.onClick}>
-          {this.props.machine.states.map( (s,i) => (
+          {this.props.machine.states.map( (s,i) => {
+            let attachmentPoints = "";
+            if (this.props.addingTransition) {
+              if (i === this.props.transitionSrc.state) {
+                  attachmentPoints = this.props.transitionSrc.loc;
+              } else {
+                  attachmentPoints = "A";
+              }
+            }
+
+            return (
             <State
-              state={s} //object holding state attributes (currently just location)
+              key={s.key}
+              state={s} //object holding state attributes
               size={this.state} //size of canvas, used to bound state's drag area
               clicked={i === this.props.clickedState} //whether this is clicked state
               start={i === this.props.machine.startState} //whether this is start state
               onClick={() => this.props.onStateClick(i)} //function to call on state click
               onDragEnd={(e) => this.props.onStateDrag(e,i)} //function to call on state drag end
+              onAttachPointClick={(loc)=>this.props.onAttachPointClick(i,loc)}
+              attachmentPoints={attachmentPoints}
             />
-          ))}
+          )})}
 	        {this.props.machine.comments.map( (s,i) => (
             <Comment
               comment={s} //object holding state attributes (currently just location)
@@ -47,6 +62,13 @@ class MachineCanvas extends React.Component {
               onDragEnd={(e) => this.props.onCommentDrag(e,i)} //function to call on state drag end
              />
           ))}
+          {this.props.machine.transitions.map( (s) => (
+            <Transition
+              src={{ state: this.props.machine.states[s.srcState], loc: s.srcLoc}}
+              dest={{ state: this.props.machine.states[s.destState], loc: s.destLoc}}
+            />
+          ))}
+
       </Stage>
     )
   }
