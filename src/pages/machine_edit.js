@@ -16,7 +16,8 @@ const PageStatus = {
   addComment : 4,
   commentSelected : 5,
   addTransitionSrc : 6,
-  addTransitionDest : 7
+  addTransitionDest : 7,
+  transitionSelected : 8
 }
 
 class EditPage extends React.Component {
@@ -35,6 +36,8 @@ class EditPage extends React.Component {
     isComment : false,
     isCommentEdit : false,
     clickState : null,
+
+    clickedTransition : -1, //transition which is currently clicked, -1 for no transition
 
     // transition in progress; state is a reference, location is "N", "E", "S", "W"
     newTransitionSrc : {state: null, loc: ""},
@@ -59,18 +62,6 @@ class EditPage extends React.Component {
     }
   }
 
-  buttons = () => [
-    {
-      body: "Add State",
-      onClick: () => this.setState({ status: PageStatus.addState })
-    },
-    {
-      body: "Add Comment",
-      onClick: () => this.setState({ status: PageStatus.addComment })
-    }
-
-  ];
-
   handleCanvasClick = e => {
     if (this.state.status === PageStatus.addState) {
       this.setState({
@@ -90,6 +81,15 @@ class EditPage extends React.Component {
 
   }
 
+  unselectAll = () => {
+    this.setState({
+      status: PageStatus.default, //now in default page status
+      clickedState: -1,
+      clickedComment: -1,
+      clickedTransition: -1,
+    });
+  }
+
   handleStateClick = i => {
     // disable state clicking when we are trying to add a transition
     if (this.state.status === PageStatus.addTransitionSrc ||
@@ -97,12 +97,13 @@ class EditPage extends React.Component {
             return;
     }
 
-    if (this.state.clickedState === i) { //this state is currently selected, so we unselect it
-      this.setState({
-        status: PageStatus.default, //return to default page status
-        clickedState: -1 //no state is currently clicked
-      });
-    } else { //this state is currently unselected
+    let clickme = true;
+    if (this.state.clickedState === i) {
+        clickme = false;
+    }
+
+    this.unselectAll();
+    if (clickme) {
       this.setState({
         status: PageStatus.stateSelected, //now in state selected page status
         clickedState: i //indicate that this state has been clicked
@@ -170,12 +171,13 @@ class EditPage extends React.Component {
   }
 
   handleCommentClick = i => {
-    if (this.state.clickedComment === i) { //this state is currently selected, so we unselect it
-      this.setState({
-        status: PageStatus.default, //return to default page status
-        clickedComment: -1 //no state is currently clicked
-      });
-    } else { //this state is currently unselected
+    let clickme = true;
+    if (this.state.clickedComment === i) {
+        clickme = false;
+    }
+
+    this.unselectAll();
+    if (clickme) {
       this.setState({
         status: PageStatus.commentSelected, //now in state selected page status
         clickedComment: i //indicate that this state has been clicked
@@ -229,6 +231,21 @@ class EditPage extends React.Component {
         }}),
         newTransitionSrc: {state: null, loc: ""}
       })
+    }
+  }
+
+  handleTransitionClick = i => {
+    let clickme = true;
+    if (this.state.clickedTransition === i) {
+        clickme = false;
+    }
+
+    this.unselectAll();
+    if (clickme) {
+      this.setState({
+        status: PageStatus.transitionSelected, //now in state selected page status
+        clickedTransition: i //indicate that this state has been clicked
+      });
     }
   }
 
@@ -286,6 +303,13 @@ class EditPage extends React.Component {
     />);
   }
 
+  getTransitionToolbar = () => {
+    return (<ADAMToolbar title="MODIFY TRANSITION"
+      back={() => this.setState({ status: PageStatus.default, clickedTransition: -1 }) }
+      btns={[]}
+    />);
+  }
+
   getMainToolbar = () => {
     return (<ADAMToolbar
       title="EDIT"
@@ -313,6 +337,8 @@ class EditPage extends React.Component {
         return this.getStateToolbar();
       } else if (s === PageStatus.commentSelected) {
         return this.getCommentToolbar();
+      } else if (s === PageStatus.transitionSelected) {
+        return this.getTransitionToolbar();
       } else {
         return this.getMainToolbar();
       }
@@ -344,6 +370,8 @@ class EditPage extends React.Component {
             onAttachPointClick={this.handleAttachmentPointClick}
             addingTransition={this.state.status === PageStatus.addTransitionSrc || this.state.status === PageStatus.addTransitionDest}
             transitionSrc={this.state.newTransitionSrc}
+            clickedTransition={this.state.clickedTransition}
+            onTransitionClick={this.handleTransitionClick}
             text={CommentDialog.commentText}
 	        />
         </Paper>

@@ -1,5 +1,5 @@
 import React from "react";
-import { Layer, Arrow } from 'react-konva';
+import { Layer, Arrow, Group,Line } from 'react-konva';
 
 class Transition extends React.Component {
 
@@ -59,13 +59,22 @@ class Transition extends React.Component {
 
         return (
             <Layer>
-            <Arrow
-            points = {points}
-            fill={"black"}
-            stroke={"black"}
-            strokeWidth={1}
-            bezier={true}
-            />
+            <Group>
+              <Line
+                points = {points}
+                stroke={"white"}
+                strokeWidth={20}
+                bezier={true}
+                onClick={this.props.onClick}
+              />
+              <Arrow
+                points = {points}
+                fill={this.props.clicked ? "green" : "black"}
+                stroke={this.props.clicked ? "green" : "black"}
+                strokeWidth={this.props.clicked ? 3 : 1}
+                bezier={true}
+              />
+            </Group>
             </Layer>
         );
     }
