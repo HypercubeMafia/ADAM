@@ -44,7 +44,11 @@ class EditPage extends React.Component {
 
     // these variables are used to give a unique identifier to the canvas components
     // they should be updated whenever the component is created or moved
-    nextStateKey : 0
+    nextStateKey : 0,
+
+    // canvas click handler is called after component click handlers
+    // this is used to allow components to be selected properly
+    somethingJustClicked : false
   };
 
   getModeText = () => {
@@ -62,25 +66,6 @@ class EditPage extends React.Component {
     }
   }
 
-  handleCanvasClick = e => {
-    if (this.state.status === PageStatus.addState) {
-      this.setState({
-        machine:
-          update(this.state.machine, {states: {
-            $push: [{key:"s"+this.state.nextStateKey, x:e.evt.offsetX, y:e.evt.offsetY, accepting:false, name:""}]
-            // add a state centered at the click location to states array
-          }}),
-        status: PageStatus.default, //return to default page status
-        nextStateKey: this.state.nextStateKey + 1
-      });
-
-    }
-    else if (this.state.status === PageStatus.addComment) {
- 	    this.setState({isComment:true, clickState:e});
-     }
-
-  }
-
   unselectAll = () => {
     this.setState({
       status: PageStatus.default, //now in default page status
@@ -88,6 +73,35 @@ class EditPage extends React.Component {
       clickedComment: -1,
       clickedTransition: -1,
     });
+  }
+
+  handleCanvasClick = e => {
+    switch (this.state.status) {
+      case PageStatus.addState:
+        this.setState({
+          machine:
+            update(this.state.machine, {states: {
+              $push: [{key:"s"+this.state.nextStateKey, x:e.evt.offsetX, y:e.evt.offsetY, accepting:false, name:""}] // add a state centered at the click location to states array
+            }}),
+          status: PageStatus.default, //return to default page status
+          nextStateKey: this.state.nextStateKey + 1
+        });
+        break;
+      case PageStatus.addComment:
+        this.setState({isComment:true, clickState:e});
+        break;
+      default:
+        console.log("Default canvas click");
+        console.log("S: " + this.state.clickedState);
+        console.log("C: " + this.state.clickedComment);
+        console.log("T: " + this.state.clickedTransition);
+
+        if (!this.state.somethingJustClicked) {
+          this.unselectAll();
+        }
+        break;
+    }
+    this.setState({ somethingJustClicked : false });
   }
 
   handleStateClick = i => {
@@ -106,7 +120,8 @@ class EditPage extends React.Component {
     if (clickme) {
       this.setState({
         status: PageStatus.stateSelected, //now in state selected page status
-        clickedState: i //indicate that this state has been clicked
+        clickedState: i, //indicate that this state has been clicked
+        somethingJustClicked: true
       });
     }
   }
@@ -180,7 +195,8 @@ class EditPage extends React.Component {
     if (clickme) {
       this.setState({
         status: PageStatus.commentSelected, //now in state selected page status
-        clickedComment: i //indicate that this state has been clicked
+        clickedComment: i, //indicate that this state has been clicked
+        somethingJustClicked: true
       });
     }
   }
@@ -216,7 +232,8 @@ class EditPage extends React.Component {
     if (this.state.status === PageStatus.addTransitionSrc) {
       this.setState({
         status : PageStatus.addTransitionDest,
-        newTransitionSrc : { state: s, loc: loc }
+        newTransitionSrc : { state: s, loc: loc },
+        somethingJustClicked: true
       });
     } else if (this.state.status === PageStatus.addTransitionDest) {
       this.setState({
@@ -229,7 +246,8 @@ class EditPage extends React.Component {
                     destLoc : loc
                  }]
         }}),
-        newTransitionSrc: {state: null, loc: ""}
+        newTransitionSrc: {state: null, loc: ""},
+        somethingJustClicked: true
       })
     }
   }
@@ -244,7 +262,8 @@ class EditPage extends React.Component {
     if (clickme) {
       this.setState({
         status: PageStatus.transitionSelected, //now in state selected page status
-        clickedTransition: i //indicate that this state has been clicked
+        clickedTransition: i, //indicate that this state has been clicked
+        somethingJustClicked: true
       });
     }
   }
