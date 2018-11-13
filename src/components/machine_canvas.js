@@ -32,6 +32,8 @@ class MachineCanvas extends React.Component {
       <Stage width={this.state.width} height={this.state.height} onClick={this.props.onClick}>
           {this.props.machine.transitions.map( (s,i) => (
             <Transition
+              key={s.key}
+              size={this.state} //size of canvas, used to bound control point's drag area
               src={{ state: this.props.machine.states[s.srcState], loc: s.srcLoc}}
               dest={{ state: this.props.machine.states[s.destState], loc: s.destLoc}}
               clicked={i === this.props.clickedTransition} //whether this is clicked state

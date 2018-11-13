@@ -45,6 +45,7 @@ class EditPage extends React.Component {
     // these variables are used to give a unique identifier to the canvas components
     // they should be updated whenever the component is created or moved
     nextStateKey : 0,
+    nextTransitionKey : 0,
 
     // canvas click handler is called after component click handlers
     // this is used to allow components to be selected properly
@@ -72,6 +73,7 @@ class EditPage extends React.Component {
       clickedState: -1,
       clickedComment: -1,
       clickedTransition: -1,
+      newTransitionSrc : {state: null, loc: ""}
     });
   }
 
@@ -91,11 +93,6 @@ class EditPage extends React.Component {
         this.setState({isComment:true, clickState:e});
         break;
       default:
-        console.log("Default canvas click");
-        console.log("S: " + this.state.clickedState);
-        console.log("C: " + this.state.clickedComment);
-        console.log("T: " + this.state.clickedTransition);
-
         if (!this.state.somethingJustClicked) {
           this.unselectAll();
         }
@@ -240,6 +237,7 @@ class EditPage extends React.Component {
         status : PageStatus.default,
         machine : update(this.state.machine, { transitions: {
           $push: [{
+                    key : "t"+this.state.nextTransitionKey,
                     srcState : this.state.newTransitionSrc.state,
                     srcLoc : this.state.newTransitionSrc.loc,
                     destState : s,
@@ -247,6 +245,7 @@ class EditPage extends React.Component {
                  }]
         }}),
         newTransitionSrc: {state: null, loc: ""},
+        nextTransitionKey: this.state.nextTransitionKey + 1,
         somethingJustClicked: true
       })
     }
