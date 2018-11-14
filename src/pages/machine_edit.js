@@ -16,7 +16,8 @@ const PageStatus = {
   addComment : 4,
   commentSelected : 5,
   addTransitionSrc : 6,
-  addTransitionDest : 7
+  addTransitionDest : 7,
+  transitionSelected : 8
 }
 
 class EditPage extends React.Component {
@@ -36,12 +37,19 @@ class EditPage extends React.Component {
     isCommentEdit : false,
     clickState : null,
 
+    clickedTransition : -1, //transition which is currently clicked, -1 for no transition
+
     // transition in progress; state is a reference, location is "N", "E", "S", "W"
     newTransitionSrc : {state: null, loc: ""},
 
     // these variables are used to give a unique identifier to the canvas components
     // they should be updated whenever the component is created or moved
-    nextStateKey : 0
+    nextStateKey : 0,
+    nextTransitionKey : 0,
+
+    // canvas click handler is called after component click handlers
+    // this is used to allow components to be selected properly
+    somethingJustClicked : false
   };
 
   getModeText = () => {
@@ -59,35 +67,38 @@ class EditPage extends React.Component {
     }
   }
 
-  buttons = () => [
-    {
-      body: "Add State",
-      onClick: () => this.setState({ status: PageStatus.addState })
-    },
-    {
-      body: "Add Comment",
-      onClick: () => this.setState({ status: PageStatus.addComment })
-    }
-
-  ];
+  unselectAll = () => {
+    this.setState({
+      status: PageStatus.default, //now in default page status
+      clickedState: -1,
+      clickedComment: -1,
+      clickedTransition: -1,
+      newTransitionSrc : {state: null, loc: ""}
+    });
+  }
 
   handleCanvasClick = e => {
-    if (this.state.status === PageStatus.addState) {
-      this.setState({
-        machine:
-          update(this.state.machine, {states: {
-            $push: [{key:"s"+this.state.nextStateKey, x:e.evt.offsetX, y:e.evt.offsetY, accepting:false, name:""}]
-            // add a state centered at the click location to states array
-          }}),
-        status: PageStatus.default, //return to default page status
-        nextStateKey: this.state.nextStateKey + 1
-      });
-
+    switch (this.state.status) {
+      case PageStatus.addState:
+        this.setState({
+          machine:
+            update(this.state.machine, {states: {
+              $push: [{key:"s"+this.state.nextStateKey, x:e.evt.offsetX, y:e.evt.offsetY, accepting:false, name:""}] // add a state centered at the click location to states array
+            }}),
+          status: PageStatus.default, //return to default page status
+          nextStateKey: this.state.nextStateKey + 1
+        });
+        break;
+      case PageStatus.addComment:
+        this.setState({isComment:true, clickState:e});
+        break;
+      default:
+        if (!this.state.somethingJustClicked) {
+          this.unselectAll();
+        }
+        break;
     }
-    else if (this.state.status === PageStatus.addComment) {
- 	    this.setState({isComment:true, clickState:e});
-     }
-
+    this.setState({ somethingJustClicked : false });
   }
 
   handleStateClick = i => {
@@ -97,15 +108,17 @@ class EditPage extends React.Component {
             return;
     }
 
-    if (this.state.clickedState === i) { //this state is currently selected, so we unselect it
-      this.setState({
-        status: PageStatus.default, //return to default page status
-        clickedState: -1 //no state is currently clicked
-      });
-    } else { //this state is currently unselected
+    let clickme = true;
+    if (this.state.clickedState === i) {
+        clickme = false;
+    }
+
+    this.unselectAll();
+    if (clickme) {
       this.setState({
         status: PageStatus.stateSelected, //now in state selected page status
-        clickedState: i //indicate that this state has been clicked
+        clickedState: i, //indicate that this state has been clicked
+        somethingJustClicked: true
       });
     }
   }
@@ -170,15 +183,17 @@ class EditPage extends React.Component {
   }
 
   handleCommentClick = i => {
-    if (this.state.clickedComment === i) { //this state is currently selected, so we unselect it
-      this.setState({
-        status: PageStatus.default, //return to default page status
-        clickedComment: -1 //no state is currently clicked
-      });
-    } else { //this state is currently unselected
+    let clickme = true;
+    if (this.state.clickedComment === i) {
+        clickme = false;
+    }
+
+    this.unselectAll();
+    if (clickme) {
       this.setState({
         status: PageStatus.commentSelected, //now in state selected page status
-        clickedComment: i //indicate that this state has been clicked
+        clickedComment: i, //indicate that this state has been clicked
+        somethingJustClicked: true
       });
     }
   }
@@ -214,21 +229,41 @@ class EditPage extends React.Component {
     if (this.state.status === PageStatus.addTransitionSrc) {
       this.setState({
         status : PageStatus.addTransitionDest,
-        newTransitionSrc : { state: s, loc: loc }
+        newTransitionSrc : { state: s, loc: loc },
+        somethingJustClicked: true
       });
     } else if (this.state.status === PageStatus.addTransitionDest) {
       this.setState({
         status : PageStatus.default,
         machine : update(this.state.machine, { transitions: {
           $push: [{
+                    key : "t"+this.state.nextTransitionKey,
                     srcState : this.state.newTransitionSrc.state,
                     srcLoc : this.state.newTransitionSrc.loc,
                     destState : s,
                     destLoc : loc
                  }]
         }}),
-        newTransitionSrc: {state: null, loc: ""}
+        newTransitionSrc: {state: null, loc: ""},
+        nextTransitionKey: this.state.nextTransitionKey + 1,
+        somethingJustClicked: true
       })
+    }
+  }
+
+  handleTransitionClick = i => {
+    let clickme = true;
+    if (this.state.clickedTransition === i) {
+        clickme = false;
+    }
+
+    this.unselectAll();
+    if (clickme) {
+      this.setState({
+        status: PageStatus.transitionSelected, //now in state selected page status
+        clickedTransition: i, //indicate that this state has been clicked
+        somethingJustClicked: true
+      });
     }
   }
 
@@ -286,6 +321,13 @@ class EditPage extends React.Component {
     />);
   }
 
+  getTransitionToolbar = () => {
+    return (<ADAMToolbar title="MODIFY TRANSITION"
+      back={() => this.setState({ status: PageStatus.default, clickedTransition: -1 }) }
+      btns={[]}
+    />);
+  }
+
   getMainToolbar = () => {
     return (<ADAMToolbar
       title="EDIT"
@@ -313,6 +355,8 @@ class EditPage extends React.Component {
         return this.getStateToolbar();
       } else if (s === PageStatus.commentSelected) {
         return this.getCommentToolbar();
+      } else if (s === PageStatus.transitionSelected) {
+        return this.getTransitionToolbar();
       } else {
         return this.getMainToolbar();
       }
@@ -344,6 +388,8 @@ class EditPage extends React.Component {
             onAttachPointClick={this.handleAttachmentPointClick}
             addingTransition={this.state.status === PageStatus.addTransitionSrc || this.state.status === PageStatus.addTransitionDest}
             transitionSrc={this.state.newTransitionSrc}
+            clickedTransition={this.state.clickedTransition}
+            onTransitionClick={this.handleTransitionClick}
             text={CommentDialog.commentText}
 	        />
         </Paper>
