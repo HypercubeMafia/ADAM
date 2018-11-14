@@ -1,5 +1,5 @@
 import React from "react";
-import { Layer, Arrow, Group, Line, Circle } from 'react-konva';
+import { Layer, Arrow, Group, Line, Circle, Text } from 'react-konva';
 
 class Transition extends React.Component {
   radius = 40; // MUST match radius in state.js!!!!!
@@ -36,6 +36,34 @@ class Transition extends React.Component {
     let xc2 = src.state.x + tri_len * (this.xOffset(src.loc) + 0.6 * this.yOffset(src.loc));
     let yc2 = src.state.y + tri_len * (this.yOffset(src.loc) + 0.6 * this.xOffset(src.loc));
     return [x,y,xc1,yc1,xc2,yc2,x,y];
+  }
+
+  label_link = () => {
+
+      let src = this.props.src;
+      let dest= this.props.dest;
+      let controlX = this.state.controlX;
+      let controlY = this.state.controlY;
+
+      let off = 25;
+
+      let x1 = src.state.x + this.xOffset(src.loc);
+      let y1 = src.state.y + this.yOffset(src.loc);
+      let x2 = dest.state.x + this.xOffset(dest.loc);
+      let y2 = dest.state.y + this.yOffset(dest.loc);
+      let xc = this.state.controlX(x1,y1,x2,y2);
+      let yc = this.state.controlY(x1,y1,x2,y2);
+
+      let x_ctr = (x2 - x1) / 2;
+      let y_ctr = (y2 - y1) / 2;
+
+      let slopeY = (yc - y_ctr) / ((xc - x_ctr) ? (xc - x_ctr) : 0.000001);
+      let slopeX = (xc - x_ctr) / ((yc - y_ctr) ? (yc - y_ctr) : 0.000001);
+
+      let lx = x_ctr + off * slopeX;
+      let ly = y_ctr + off * slopeY;
+
+      return { x : lx, y : ly };
   }
 
   dragBound = pos => { //function which ensures the control point is not dragged off of canvas
@@ -93,6 +121,13 @@ class Transition extends React.Component {
             bezier={true}
             onClick={this.props.onClick}
           />
+          <Text
+            text={this.props.transition.txt}
+            fontSize={18}
+            padding={5}
+            x={points[2]}
+            y={points[3]}
+          />
           <Arrow
             points = {points}
             fill={this.props.clicked ? "green" : "black"}
@@ -106,5 +141,11 @@ class Transition extends React.Component {
     );
   }
 }
+// <Circle
+//   x={this.label_link().x}
+//   y={this.label_link().y}
+//   radius={this.control_radius}
+//   fill={"blue"}
+// />
 
 export default Transition;

@@ -33,6 +33,7 @@ class MachineCanvas extends React.Component {
           {this.props.machine.transitions.map( (s,i) => (
             <Transition
               key={s.key}
+              transition={s}
               size={this.state} //size of canvas, used to bound control point's drag area
               src={{ state: this.props.machine.states[s.srcState], loc: s.srcLoc}}
               dest={{ state: this.props.machine.states[s.destState], loc: s.destLoc}}
@@ -64,7 +65,7 @@ class MachineCanvas extends React.Component {
           )})}
 	        {this.props.machine.comments.map( (s,i) => (
             <Comment
-              comment={s} //object holding state attributes (currently just location)
+              comment={s} //object holding state attributes
               size={this.state} //size of canvas, used to bound state's drag area
               clicked={i === this.props.clickedComment} //whether this is clicked state
               onClick={() => this.props.onCommentClick(i)} //function to call on comment click

@@ -35,6 +35,7 @@ class EditPage extends React.Component {
     clickedComment : -1, //comment which is currently clicked, -1 for no comment
     isComment : false,
     isCommentEdit : false,
+    isTransitionLabel : false,
     clickState : null,
 
     clickedTransition : -1, //transition which is currently clicked, -1 for no transition
@@ -202,7 +203,7 @@ class EditPage extends React.Component {
     this.setState({
         machine:
           update(this.state.machine, {comments: {
-            $push: [{x:this.state.clickState.evt.offsetX, y:this.state.clickState.evt.offsetY, com:text}] // add a state centered at the click location to states array
+            $push: [{x:this.state.clickState.evt.offsetX, y:this.state.clickState.evt.offsetY, com:text}]
           }}),
         status: PageStatus.default //return to default page status
       });
@@ -217,12 +218,25 @@ class EditPage extends React.Component {
       });
   }
 
+  labelTransition = (text) => {
+    this.setState({
+        machine:
+          update(this.state.machine, {transitions: {[this.state.clickedTransition]: { txt: {
+            $set: text
+          }}}})
+      });
+  }
+
   handleOptionsClose = () => {
         this.setState({isComment: false,status:PageStatus.default});
   }
 
   handleOptionsCloseEdit = () => {
         this.setState({isCommentEdit: false});
+  }
+
+  handleOptionsCloseLable = () => {
+        this.setState({isTransitionLabel: false});
   }
 
   handleAttachmentPointClick = (s, loc) => {
@@ -241,7 +255,8 @@ class EditPage extends React.Component {
                     srcState : this.state.newTransitionSrc.state,
                     srcLoc : this.state.newTransitionSrc.loc,
                     destState : s,
-                    destLoc : loc
+                    destLoc : loc,
+                    txt : ""
                  }]
         }}),
         newTransitionSrc: {state: null, loc: ""},
@@ -324,7 +339,14 @@ class EditPage extends React.Component {
   getTransitionToolbar = () => {
     return (<ADAMToolbar title="MODIFY TRANSITION"
       back={() => this.setState({ status: PageStatus.default, clickedTransition: -1 }) }
-      btns={[]}
+      btns={[
+        {
+          body: "Edit Label",
+          onClick: () => this.setState({
+            isTransitionLabel : true
+          })
+        }
+      ]}
     />);
   }
 
@@ -375,6 +397,8 @@ class EditPage extends React.Component {
                  	 type={this.props.type} update={this.makeComment} def={this.state.clickedComment === -1 ? "" : this.state.machine.comments[this.state.clickedComment].com}/>
         <CommentDialog isOpen={this.state.isCommentEdit} onClose={this.handleOptionsCloseEdit}
                 	 type={this.props.type} update={this.editComment} def={this.state.clickedComment === -1 ? "" : this.state.machine.comments[this.state.clickedComment].com}/>
+        <CommentDialog isOpen={this.state.isTransitionLabel} onClose={this.handleOptionsCloseLable}
+                 	 type={this.props.type} update={this.labelTransition} def={this.state.clickedTransition === -1 ? "" : this.state.machine.transitions[this.state.clickedTransition].txt}/>
         <Paper elevation={1} style={{margin:32, padding:0}}>
           <MachineCanvas
             machine={this.state.machine}
