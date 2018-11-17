@@ -324,7 +324,18 @@ class EditPage extends React.Component {
   getTransitionToolbar = () => {
     return (<ADAMToolbar title="MODIFY TRANSITION"
       back={() => this.setState({ status: PageStatus.default, clickedTransition: -1 }) }
-      btns={[]}
+      btns={[
+        {
+          body: "Delete",
+          onClick: () => this.setState({
+            machine: update(this.state.machine, {transitions: {
+              $splice: [[this.state.clickedTransition, 1]]
+            }}),
+            clickedTransition: -1,
+            status: PageStatus.default
+          })
+        }
+      ]}
     />);
   }
 
