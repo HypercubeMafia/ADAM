@@ -292,6 +292,10 @@ class EditPage extends React.Component {
         {
           body: "Change Name",
           onClick: () => this.nameStateOpen()
+        },
+        {
+          body: "Delete",
+          onClick: () => null
         }
       ]}
     />);
@@ -302,6 +306,12 @@ class EditPage extends React.Component {
       back={() => this.setState({ status: PageStatus.default, clickedComment: -1 }) }
       btns={[
         {
+          body: "Edit",
+          onClick: () => this.setState({
+            isCommentEdit : true
+          })
+        },
+        {
           body: "Delete",
           onClick: () => this.setState({
             machine: update(this.state.machine, {comments: {
@@ -309,12 +319,6 @@ class EditPage extends React.Component {
             }}),
             clickedComment: -1,
             status: PageStatus.default
-          })
-        },
-        {
-          body: "Edit",
-          onClick: () => this.setState({
-            isCommentEdit : true
           })
         }
       ]}
