@@ -28,14 +28,17 @@ class MachineCanvas extends React.Component {
   }
 
   render() {
+    let withKey = (state, key) => state.okey === key;
+    let sts = this.props.machine.states;
+
     return (
       <Stage width={this.state.width} height={this.state.height} onClick={this.props.onClick}>
           {this.props.machine.transitions.map( (s,i) => (
             <Transition
               key={s.key}
               size={this.state} //size of canvas, used to bound control point's drag area
-              src={{ state: this.props.machine.states[s.srcState], loc: s.srcLoc}}
-              dest={{ state: this.props.machine.states[s.destState], loc: s.destLoc}}
+              src={{ state: sts.find((e) => withKey(e,s.srcState)), loc: s.srcLoc}}
+              dest={{ state: sts.find((e) => withKey(e,s.destState)), loc: s.destLoc}}
               clicked={i === this.props.clickedTransition} //whether this is clicked state
               onClick={() => this.props.onTransitionClick(i)} //function to call on comment click
             />
@@ -55,10 +58,10 @@ class MachineCanvas extends React.Component {
               state={s} //object holding state attributes
               size={this.state} //size of canvas, used to bound state's drag area
               clicked={i === this.props.clickedState} //whether this is clicked state
-              start={i === this.props.machine.startState} //whether this is start state
+              start={s.okey === this.props.machine.startState} //whether this is start state
               onClick={() => this.props.onStateClick(i)} //function to call on state click
               onDragEnd={(e) => this.props.onStateDrag(e,i)} //function to call on state drag end
-              onAttachPointClick={(loc)=>this.props.onAttachPointClick(i,loc)}
+              onAttachPointClick={(loc)=>this.props.onAttachPointClick(s.okey,loc)}
               attachmentPoints={attachmentPoints}
             />
           )})}
