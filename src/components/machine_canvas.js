@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from 'react-dom';
-import { Stage } from 'react-konva';
+import { Stage, Layer, Rect } from 'react-konva';
 
 import State from './machine/state';
 import Comment from './machine/comment';
@@ -30,6 +30,12 @@ class MachineCanvas extends React.Component {
   render() {
     return (
       <Stage width={this.state.width} height={this.state.height} onClick={this.props.onClick}>
+      <Layer>
+      <Rect
+        width={this.state.width}
+        height={this.state.height}
+        fill={"white"}
+      />
           {this.props.machine.transitions.map( (s,i) => (
             <Transition
               key={s.key}
@@ -71,6 +77,7 @@ class MachineCanvas extends React.Component {
               onDragEnd={(e) => this.props.onCommentDrag(e,i)} //function to call on state drag end
              />
           ))}
+      </Layer>
       </Stage>
     )
   }

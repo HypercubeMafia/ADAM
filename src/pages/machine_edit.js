@@ -355,6 +355,18 @@ class EditPage extends React.Component {
         {
           body: "Add Transition",
           onClick: () => this.setState({ status: PageStatus.addTransitionSrc })
+        },
+        {
+          body: "Export Image",
+          onClick: () => {
+            var dataURL = document.getElementsByTagName("canvas")[0].toDataURL("image/png");
+            var link = document.createElement("a");
+            link.download = 'machine.png';
+            link.href = dataURL;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          }
         }
       ]}
     />);

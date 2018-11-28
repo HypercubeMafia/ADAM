@@ -13,7 +13,7 @@ class Comment extends React.Component {
         const y = pos.y < 5 ? 5 : pos.y > max_h ? max_h : pos.y ;
         return {x : x, y : y};
       }
-    };    
+    };
   }
 
   //used to force resizing of the box when text is edited
@@ -41,7 +41,7 @@ class Comment extends React.Component {
     />)
 
     return (
-      <Layer>
+      <Group>
         <Group
           draggable
           x={this.props.comment.x}
@@ -53,7 +53,7 @@ class Comment extends React.Component {
         {commentText}
         {commentBox}
         </Group>
-      </Layer>
+      </Group>
     )
   }
 }
