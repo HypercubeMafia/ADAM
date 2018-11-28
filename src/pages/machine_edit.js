@@ -330,6 +330,13 @@ class EditPage extends React.Component {
               status: PageStatus.default
             });
           }
+        },
+        {
+          body: "Cancel",
+          onClick: () => this.setState({
+            clickedState: -1,
+            status: PageStatus.default
+          })
         }
       ]}
     />);
@@ -354,6 +361,13 @@ class EditPage extends React.Component {
             clickedComment: -1,
             status: PageStatus.default
           })
+        },
+        {
+          body: "Cancel",
+          onClick: () => this.setState({
+            clickedComment: -1,
+            status: PageStatus.default
+          })
         }
       ]}
     />);
@@ -369,6 +383,13 @@ class EditPage extends React.Component {
             machine: update(this.state.machine, {transitions: {
               $splice: [[this.state.clickedTransition, 1]]
             }}),
+            clickedTransition: -1,
+            status: PageStatus.default
+          })
+        },
+        {
+          body: "Cancel",
+          onClick: () => this.setState({
             clickedTransition: -1,
             status: PageStatus.default
           })
@@ -410,6 +431,46 @@ class EditPage extends React.Component {
     />);
   }
 
+  getEditingToolbar = () => {
+    return (<ADAMToolbar
+      title="EDIT"
+      back={this.props.back}
+      btns={[
+        {
+          body: "Add State",
+          onClick: () => this.setState({ status: PageStatus.addState })
+        },
+        {
+          body: "Add Comment",
+          onClick: () => this.setState({ status: PageStatus.addComment })
+        },
+        {
+          body: "Add Transition",
+          onClick: () => this.setState({ status: PageStatus.addTransitionSrc })
+        },
+        {
+          body: "Export Image",
+          onClick: () => {
+            var dataURL = document.getElementsByTagName("canvas")[0].toDataURL("image/png");
+            var link = document.createElement("a");
+            link.download = 'machine.png';
+            link.href = dataURL;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+          }
+        },
+        {
+          body: "Cancel",
+          onClick: () => this.setState({
+            clickedTransition: -1,
+            status: PageStatus.default
+          })
+        }
+      ]}
+    />);
+  }
+
   render() {
     var toolbar = ((s) => {
       if (s === PageStatus.stateSelected) {
@@ -418,8 +479,12 @@ class EditPage extends React.Component {
         return this.getCommentToolbar();
       } else if (s === PageStatus.transitionSelected) {
         return this.getTransitionToolbar();
-      } else {
+      }
+        else if (s === PageStatus.default){
         return this.getMainToolbar();
+      }
+      else{
+        return this.getEditingToolbar();
       }
   })(this.state.status);
 
