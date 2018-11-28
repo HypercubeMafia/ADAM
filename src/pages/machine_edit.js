@@ -404,11 +404,14 @@ class EditPage extends React.Component {
           </Typography>
         </Paper>
     	  <CommentDialog isOpen={this.state.isComment} onClose={this.handleOptionsClose}
-                 	 type={this.props.type} update={this.makeComment} def={this.state.clickedComment === -1 ? "" : this.state.machine.comments[this.state.clickedComment].com}/>
+                 	 type={this.props.type} update={this.makeComment} def={this.state.clickedComment === -1 ? "" : this.state.machine.comments[this.state.clickedComment].com}
+                   dialog_type={"Comment"}/>
         <CommentDialog isOpen={this.state.isCommentEdit} onClose={this.handleOptionsCloseEdit}
-                	 type={this.props.type} update={this.editComment} def={this.state.clickedComment === -1 ? "" : this.state.machine.comments[this.state.clickedComment].com}/>
+                	 type={this.props.type} update={this.editComment} def={this.state.clickedComment === -1 ? "" : this.state.machine.comments[this.state.clickedComment].com}
+                   dialog_type={"Comment"}/>
         <CommentDialog isOpen={this.state.isTransitionLabel} onClose={this.handleOptionsCloseLable}
-                 	 type={this.props.type} update={this.labelTransition} def={this.state.clickedTransition === -1 ? "" : this.state.machine.transitions[this.state.clickedTransition].txt}/>
+                 	 type={this.props.type} update={this.labelTransition} def={this.state.clickedTransition === -1 ? "" : this.state.machine.transitions[this.state.clickedTransition].txt}
+                   dialog_type={"Label"}/>
         <Paper elevation={1} style={{margin:32, padding:0}}>
           <MachineCanvas
             machine={this.state.machine}
