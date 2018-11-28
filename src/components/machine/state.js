@@ -112,7 +112,6 @@ class State extends React.Component {
     : null;
 
     return (
-      <Layer>
         <Group
           draggable
           dragBoundFunc = {this.dragBound}
@@ -129,7 +128,6 @@ class State extends React.Component {
           {attachSouth}
           {attachWest}
         </Group>
-      </Layer>
     )
   }
 }

@@ -84,7 +84,6 @@ class Transition extends React.Component {
 
 
     return (
-        <Layer>
         <Group>
           <Line
             points = {points}
@@ -102,7 +101,6 @@ class Transition extends React.Component {
           />
           {control}
         </Group>
-        </Layer>
     );
   }
 }
