@@ -25,7 +25,7 @@ class EditPage extends React.Component {
     status : PageStatus.default, //current action being performed
     machine : { // machine description
       states : [],
-      startState : -1, //-1 for no state
+      startState : null, //okey of start state, null if no start state is selected
       comments : [],
       transitions : []
     },
@@ -83,7 +83,12 @@ class EditPage extends React.Component {
         this.setState({
           machine:
             update(this.state.machine, {states: {
-              $push: [{key:"s"+this.state.nextStateKey, x:e.evt.offsetX, y:e.evt.offsetY, accepting:false, name:""}] // add a state centered at the click location to states array
+              $push: [{ key:"s"+this.state.nextStateKey, // used for rerendering
+                        okey:"s"+this.state.nextStateKey, //used by transitions
+                        x:e.evt.offsetX,
+                        y:e.evt.offsetY,
+                        accepting:false,
+                        name:""}] // add a state centered at the click location to states array
             }}),
           status: PageStatus.default, //return to default page status
           nextStateKey: this.state.nextStateKey + 1
@@ -275,7 +280,7 @@ class EditPage extends React.Component {
           body: "Make Start State",
           onClick: () => this.setState({
             machine: update(this.state.machine, {startState: {
-              $set: this.state.clickedState
+              $set: this.state.machine.states[this.state.clickedState].okey
             }})
           })
         },
@@ -292,6 +297,39 @@ class EditPage extends React.Component {
         {
           body: "Change Name",
           onClick: () => this.nameStateOpen()
+        },
+        {
+          body: "Delete",
+          onClick: () => {
+            //returns true if the transition is connected to the clickedState
+            let connected = (t) =>
+              t.srcState === this.state.machine.states[this.state.clickedState].okey ||
+              t.destState === this.state.machine.states[this.state.clickedState].okey;
+
+            let ts = this.state.machine.transitions;
+            let to_splice = []; // indices of transitions connected to clickedState
+            for (let i=ts.length-1; i>=0; i--) { // in reverse order so we splice from back to front
+              if (connected(ts[i])) {
+                to_splice.push([i,1]); //list [i,1] means remove one element at that index
+              }
+            }
+
+            // we must set startState to null if we delete the current start state
+            let new_start =
+              this.state.machine.startState === this.state.clickedState
+              ? null
+              : this.state.machine.startState;
+
+            this.setState({
+              machine: update(this.state.machine, {
+                states: { $splice: [[this.state.clickedState, 1]] },
+                transitions: { $splice: to_splice },
+                startState: { $set: new_start }
+              }),
+              clickedState: -1,
+              status: PageStatus.default
+            });
+          }
         }
       ]}
     />);
@@ -302,6 +340,12 @@ class EditPage extends React.Component {
       back={() => this.setState({ status: PageStatus.default, clickedComment: -1 }) }
       btns={[
         {
+          body: "Edit",
+          onClick: () => this.setState({
+            isCommentEdit : true
+          })
+        },
+        {
           body: "Delete",
           onClick: () => this.setState({
             machine: update(this.state.machine, {comments: {
@@ -309,12 +353,6 @@ class EditPage extends React.Component {
             }}),
             clickedComment: -1,
             status: PageStatus.default
-          })
-        },
-        {
-          body: "Edit",
-          onClick: () => this.setState({
-            isCommentEdit : true
           })
         }
       ]}
