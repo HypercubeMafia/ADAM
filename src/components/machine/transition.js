@@ -1,5 +1,5 @@
 import React from "react";
-import { Layer, Arrow, Group, Line, Circle, Text } from 'react-konva';
+import { Layer, Arrow, Group, Line, Circle, Text, Rect } from 'react-konva';
 
 class Transition extends React.Component {
   radius = 40; // MUST match radius in state.js!!!!!
@@ -79,6 +79,8 @@ class Transition extends React.Component {
   constructor(props) {
     super(props);
 
+    this.text = React.createRef();
+
     if (props.src.state === props.dest.state) {
       this.state = { isLoop : true }
     } else {
@@ -89,6 +91,13 @@ class Transition extends React.Component {
       }
     }
   };
+
+  //used to force resizing of the box when text is edited
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.transition.txt !== this.props.transition.txt) {
+      this.forceUpdate();
+    }
+  }
 
   render() {
     let points = this.state.isLoop ? this.loop(this.props.src) : this.link(this.props.src, this.props.dest);
@@ -110,6 +119,22 @@ class Transition extends React.Component {
       />)
     : null;
 
+    var commentText = (<Text
+      ref={this.text}
+      text = {this.props.transition.txt}
+      fontSize = {18}
+      padding = {5}
+      align = {'left'}
+      width={250}
+    />)
+
+    var commentBox = (<Rect
+      width={(this.text.current) ? this.text.current.getTextWidth()+10 : 0}
+      height={(this.text.current) ? this.text.current.getHeight() : 0}
+      stroke={this.props.clicked ? "green" : "white"}
+      strokeWidth={2}
+      fill={'white'}
+    />)
 
     return (
         <Layer>
@@ -121,13 +146,6 @@ class Transition extends React.Component {
             bezier={true}
             onClick={this.props.onClick}
           />
-          <Text
-            text={this.props.transition.txt}
-            fontSize={18}
-            padding={5}
-            x={points[2]}
-            y={points[3]}
-          />
           <Arrow
             points = {points}
             fill={this.props.clicked ? "green" : "black"}
@@ -135,6 +153,15 @@ class Transition extends React.Component {
             strokeWidth={this.props.clicked ? 3 : 1}
             bezier={true}
           />
+          <Group
+            draggable
+            onClick={this.props.onClick}
+            x={points[2]}
+            y={points[3]}
+          >
+            {commentBox}
+            {commentText}
+          </Group>
           {control}
         </Group>
         </Layer>
