@@ -341,9 +341,19 @@ class EditPage extends React.Component {
       back={() => this.setState({ status: PageStatus.default, clickedTransition: -1 }) }
       btns={[
         {
+
           body: "Edit Label",
           onClick: () => this.setState({
-            isTransitionLabel : true
+            isTransitionLabel : true})},
+          {
+          body: "Delete",
+          onClick: () => this.setState({
+            machine: update(this.state.machine, {transitions: {
+              $splice: [[this.state.clickedTransition, 1]]
+            }}),
+            clickedTransition: -1,
+            status: PageStatus.default
+
           })
         }
       ]}
