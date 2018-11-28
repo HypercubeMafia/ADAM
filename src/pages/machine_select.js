@@ -124,24 +124,73 @@ class DuplicateDialog extends React.Component {
   }
 }
 
+class DeleteDialog extends React.Component {
+
+  state = {
+    name: "",
+  }
+
+  onSubmit = () => {
+      this.props.deleteMachine(this.props.type, this.props.name);
+      this.props.onClose();
+    }
+
+  render() {
+    return (
+      <Dialog
+          open={this.props.isOpen}
+          onClose={this.props.onClose}
+          aria-labelledby="form-dialog-title"
+        >
+          <DialogTitle id="form-dialog-title">Deleting "{this.props.name}"</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Are you sure you want to delete "{this.props.name}" ?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.props.onClose} color="primary">
+              Cancel
+            </Button>
+            <Button onClick={this.onSubmit} color="primary">
+              Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
+    )
+  }
+}
+
 class MachineCard extends React.Component {
   state = {
     anchorEl: null,
     duplicateOpen: false,
+    deleteOpen: false
   };
 
   handleOptionsClick = event => {
-    this.setState({ anchorEl: event.currentTarget, duplicateOpen: false });
+    this.setState({ anchorEl: event.currentTarget, duplicateOpen: false, deleteOpen: false });
   };
 
   handleOptionsClose = () => {
-    this.setState({ anchorEl: null, duplicateOpen: false });
+    this.setState({ anchorEl: null, duplicateOpen: false, deleteOpen: false });
   };
 
   openDuplicate = () => {
     this.setState( (prevState, props) => {
       return {
         duplicateOpen: true,
+        deleteOpen: false,
+        anchorEl: prevState.anchorEl
+      };
+    });
+  }
+
+  openDelete = () => {
+    this.setState( (prevState, props) => {
+      return {
+        deleteOpen: true,
+        duplicateOpen: false,
         anchorEl: prevState.anchorEl
       };
     });
@@ -160,13 +209,16 @@ class MachineCard extends React.Component {
         <MenuItem onClick={this.openDuplicate} onClose={this.onClose}>
           Duplicate
         </MenuItem>
-        <MenuItem onClick={() => alert('Boop!')} onClose={this.onClose}>
+        <MenuItem onClick={this.openDelete} onClose={this.onClose}>
           Delete
         </MenuItem>
       </Menu>
       <DuplicateDialog isOpen={this.state.duplicateOpen} onClose={this.handleOptionsClose}
                        name={this.props.title} type={this.props.type}
                        addMachine={this.props.addMachine} machines={this.props.machines} />
+      <DeleteDialog isOpen={this.state.deleteOpen} onClose={this.handleOptionsClose}
+                       name={this.props.title} type={this.props.type}
+                       deleteMachine={this.props.deleteMachine} machines={this.props.machines} />
       <Card style={styles.card}>
         <CardActions
           style={{ ...styles.banner, backgroundColor: MachineColors[this.props.type] }}
@@ -201,7 +253,8 @@ class CardGrid extends React.Component {
         {this.props.machines.map(x => (
           <Grid item>
             <MachineCard title={x.title} type={x.type} todfa={this.props.todfa}
-             addMachine={this.props.addMachine} machines={this.props.machines}/>
+             addMachine={this.props.addMachine} machines={this.props.machines}
+             deleteMachine={this.props.deleteMachine}/>
           </Grid>
         ))}
       </Grid>
@@ -290,11 +343,19 @@ class MachineSelectPage extends React.Component {
     });
   };
 
+  deleteMachine = (type, name) => {
+    this.setState((prevState, props) => {
+      return {
+        machines: prevState.machines.filter( m => m.title !== name || m.type !== type )
+      };
+    });
+  };
+
   render() {
     return (
         <div>
           <ADAMToolbar title="Select a Machine" />
-          <CardGrid todfa={this.props.todfa} addMachine={this.addMachine} machines={this.state.machines}/>
+          <CardGrid todfa={this.props.todfa} addMachine={this.addMachine} deleteMachine={this.deleteMachine} machines={this.state.machines}/>
           <AddMachineButton addMachine={this.addMachine}/>
         </div>
     );
