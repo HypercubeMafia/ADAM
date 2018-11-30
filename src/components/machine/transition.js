@@ -154,7 +154,6 @@ class Transition extends React.Component {
             bezier={true}
           />
           <Group
-            draggable
             onClick={this.props.onClick}
             x={points[2]}
             y={points[3]}
