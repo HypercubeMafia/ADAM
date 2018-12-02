@@ -142,7 +142,7 @@ class Transition extends React.Component {
             points = {points}
             stroke={"white"}
             strokeWidth={20}
-            bezier={true}
+            bezier={"true"}
             onClick={this.props.onClick}
           />
           <Arrow
@@ -150,7 +150,7 @@ class Transition extends React.Component {
             fill={this.props.clicked ? "green" : "black"}
             stroke={this.props.clicked ? "green" : "black"}
             strokeWidth={this.props.clicked ? 3 : 1}
-            bezier={true}
+            bezier={"true"}
           />
           <Group
             onClick={this.props.onClick}
