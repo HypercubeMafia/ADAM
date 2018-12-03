@@ -1,43 +1,59 @@
 import React from "react";
-import { Layer, Text } from 'react-konva';
-import ReactDOM from 'react-dom';
+import { Layer, Text, Group, Rect } from 'react-konva';
 
 class Comment extends React.Component {
-  state={ dragBound : pos => {return{x:pos.x,y:pos.y}}}
-  width = 250;
-  componentDidMount() {
-    
-    this.setState({dragBound : pos => {
-    const height = ReactDOM.findDOMNode(this).children[0].getHeight();
-    const w = this.props.size.width;
-    const h = this.props.size.height;
-    const x = pos.x < 5 ? 5 : pos.x > w-this.width+5 ? w-this.width+5 : pos.x ;
-    const y = pos.y < 5 ? 5 : pos.y > h-height-5 ? h-height-5 : pos.y ;
-    return{x:x,y:y};
-    }});
+  constructor(props) {
+    super(props);
+    this.text = React.createRef();
+    this.state = {
+      dragBound : pos => {
+        const max_w = this.props.size.width-this.text.current.getTextWidth()-15;
+        const max_h = this.props.size.height-this.text.current.getHeight()-5;
+        const x = pos.x < 5 ? 5 : pos.x > max_w ? max_w : pos.x ;
+        const y = pos.y < 5 ? 5 : pos.y > max_h ? max_h : pos.y ;
+        return {x : x, y : y};
+      }
+    };
   }
 
-  
+  //used to force resizing of the box when text is edited
+  componentDidUpdate(prevProps, prevState) {
+    if (prevProps.comment.com !== this.props.comment.com) {
+      this.forceUpdate();
+    }
+  }
 
   render() {
-    
-    return (
-      <Layer>
-        
-	<Text
-	 x = {this.props.comment.x}
-         y = {this.props.comment.y}
-	 text = {this.props.comment.com}
-	 fontSize = {18}
-	 padding = {20}
-	 align = {'center'}
-	 draggable
-	 width={this.width}
-         dragBoundFunc = {this.state.dragBound}
-         onDragEnd = {this.props.onDragEnd}
+    var commentText = (<Text
+      ref={this.text}
+      text = {this.props.comment.com}
+      fontSize = {18}
+      padding = {5}
+      align = {'left'}
+      width={250}
+    />)
 
-	/>	
-      </Layer>
+    var commentBox = (<Rect
+      width={(this.text.current) ? this.text.current.getTextWidth()+10 : 0}
+      height={(this.text.current) ? this.text.current.getHeight() : 0}
+      stroke={this.props.clicked ? "green" : "white"}
+      strokeWidth={2}
+    />)
+
+    return (
+      <Group>
+        <Group
+          draggable
+          x={this.props.comment.x}
+          y={this.props.comment.y}
+          dragBoundFunc = {this.state.dragBound}
+          onDragEnd = {this.props.onDragEnd}
+          onClick = {this.props.onClick}
+        >
+        {commentText}
+        {commentBox}
+        </Group>
+      </Group>
     )
   }
 }

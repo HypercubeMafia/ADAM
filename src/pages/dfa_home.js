@@ -8,10 +8,10 @@ class DFAHomePage extends React.Component {
 
 	<div>
           <ADAMToolbar title={this.props.title} back={this.props.back} btns={[
-            {body : "EDIT", onClick : this.props.edit} 
+            {body : "EDIT", onClick : this.props.edit}
           ]} />
-        
-	  <img src="/phallic_dfa.png" />
+
+	  <img src="/phallic_dfa.png" alt=""/>
 	</div>
     );
   }

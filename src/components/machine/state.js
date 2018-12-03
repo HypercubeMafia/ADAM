@@ -3,6 +3,7 @@ import { Layer, Circle, Arrow, Text, Group } from 'react-konva';
 
 class State extends React.Component {
   radius = 40;
+  attach_radius = 5;
   accept_pad = 5;
 
   dragBound = pos => { //function which ensures state is not dragged off of canvas
@@ -70,8 +71,47 @@ class State extends React.Component {
         text={this.props.state.name}
     />);
 
+    var attachNorth = ["A", "N"].includes(this.props.attachmentPoints) ?
+      (<Circle
+          x={this.props.state.x}
+          y={this.props.state.y - this.radius}
+          radius={this.attach_radius}
+          fill={"purple"}
+          onClick={()=>this.props.onAttachPointClick("N")}
+      />)
+    : null;
+
+    var attachEast = ["A", "E"].includes(this.props.attachmentPoints) ?
+      (<Circle
+          x={this.props.state.x + this.radius}
+          y={this.props.state.y}
+          radius={this.attach_radius}
+          fill={"purple"}
+          onClick={()=>this.props.onAttachPointClick("E")}
+      />)
+    : null;
+
+    var attachSouth = ["A", "S"].includes(this.props.attachmentPoints) ?
+      (<Circle
+          x={this.props.state.x}
+          y={this.props.state.y + this.radius}
+          radius={this.attach_radius}
+          fill={"purple"}
+          onClick={()=>this.props.onAttachPointClick("S")}
+      />)
+    : null;
+
+    var attachWest = ["A", "W"].includes(this.props.attachmentPoints) ?
+      (<Circle
+          x={this.props.state.x - this.radius}
+          y={this.props.state.y}
+          radius={this.attach_radius}
+          fill={"purple"}
+          onClick={()=>this.props.onAttachPointClick("W")}
+      />)
+    : null;
+
     return (
-      <Layer>
         <Group
           draggable
           dragBoundFunc = {this.dragBound}
@@ -83,8 +123,11 @@ class State extends React.Component {
           {startLabel}
           {startArrow}
           {stateLabel}
+          {attachNorth}
+          {attachEast}
+          {attachSouth}
+          {attachWest}
         </Group>
-      </Layer>
     )
   }
 }

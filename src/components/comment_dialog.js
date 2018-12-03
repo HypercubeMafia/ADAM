@@ -21,8 +21,9 @@ class CommentDialog extends React.Component {
       error={this.state.hintText.length > 0}
       autoFocus
       margin="dense"
-      label="Comment"
+      label={this.props.dialog_type}
       type="string"
+      defaultValue={this.props.def}
       onChange={e => this.setState(
         { commentText: e.target.value, hintText: this.buildHintText(e.target.value) }
       )}
@@ -34,11 +35,12 @@ class CommentDialog extends React.Component {
       }}
       fullWidth
     />
+
   );
 
   buildHintText = commentText => {
     if (commentText === "") {
-      return "Please enter a comment."; 
+      return "Please enter a "+this.props.dialog_type;
     } else {
       return "";
     }
@@ -67,10 +69,10 @@ class CommentDialog extends React.Component {
           onClose={this.props.onClose}
           aria-labelledby="form-dialog-title"
         >
-          <DialogTitle id="form-dialog-title">Comment</DialogTitle>
+          <DialogTitle id="form-dialog-title">{this.props.dialog_type}</DialogTitle>
           <DialogContent>
             <DialogContentText>
-              Enter comment text
+              Enter {this.props.dialog_type} text
             </DialogContentText>
             {this.textField()}
           </DialogContent>
